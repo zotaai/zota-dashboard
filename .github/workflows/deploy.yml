@@ -35,9 +35,11 @@ jobs:
       - name: Build (static export)
         run: npm run build
         env:
-          # Sets the base path to match your GitHub Pages URL:
-          # https://<user>.github.io/<repo-name>
+          # Base path for GitHub Pages: https://<user>.github.io/<repo-name>
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          # Google Apps Script Web App URL — store this in repo Settings → Secrets → Actions
+          # Name the secret: SHEETS_API_URL
+          NEXT_PUBLIC_SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
