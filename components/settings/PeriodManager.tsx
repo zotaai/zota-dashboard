@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Calendar, Lock, Pencil, RotateCcw } from "lucide-react";
+import { Plus, Trash2, Calendar, Lock, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
@@ -11,8 +11,6 @@ import type { BillingPeriod } from "@/types";
 export function PeriodManager() {
   const { state, dispatch } = useStore();
   const [newPeriod, setNewPeriod] = useState({ name: "", startDate: "", endDate: "" });
-  // Track which period's working days field is being edited
-  const [editingDays, setEditingDays] = useState<string | null>(null);
 
   const handleAdd = () => {
     if (!newPeriod.name || !newPeriod.startDate || !newPeriod.endDate) return;
@@ -29,11 +27,6 @@ export function PeriodManager() {
     dispatch({ type: "UPDATE_PERIOD", payload: { ...period, workingDays } });
   };
 
-  const handleResetDays = (period: BillingPeriod) => {
-    dispatch({ type: "UPDATE_PERIOD", payload: { ...period, workingDays: null } });
-    setEditingDays(null);
-  };
-
   const handleDelete = (id: string) => {
     dispatch({ type: "DELETE_PERIOD", payload: id });
   };
@@ -42,8 +35,6 @@ export function PeriodManager() {
     period.workingDays != null
       ? period.workingDays
       : calculateWorkingDays(period.startDate, period.endDate);
-
-  const isOverridden = (period: BillingPeriod) => period.workingDays != null;
 
   return (
     <div>
@@ -157,45 +148,15 @@ export function PeriodManager() {
                 </div>
 
                 {/* Días laborables — EDITABLE */}
-                <div className="flex items-center gap-1">
-                  <div className="relative flex-1">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="31"
-                      value={getWorkingDays(period)}
-                      onFocus={() => setEditingDays(period.id)}
-                      onBlur={() => setEditingDays(null)}
-                      onChange={(e) => handleUpdateDays(period, e.target.value)}
-                      className={`h-8 border text-center text-sm font-semibold transition-colors focus:bg-white/10
-                        ${isOverridden(period)
-                          ? "border-[#F59E0B]/50 bg-[#F59E0B]/10 text-[#F59E0B] focus:border-[#F59E0B]"
-                          : "border-[#0296DF]/30 bg-[#0296DF]/10 text-[#0296DF] focus:border-[#0296DF]"
-                        }
-                        ${editingDays === period.id ? "ring-1 ring-[#0296DF]/40" : ""}
-                      `}
-                    />
-                    {/* Badge: auto o editado */}
-                    <span className={`absolute -top-2 right-1 rounded-full px-1 text-[9px] font-bold leading-4
-                      ${isOverridden(period)
-                        ? "bg-[#F59E0B] text-black"
-                        : "bg-[#0296DF]/30 text-[#0296DF]"
-                      }`}
-                    >
-                      {isOverridden(period) ? "custom" : "auto"}
-                    </span>
-                  </div>
-
-                  {/* Reset a automático */}
-                  {isOverridden(period) && (
-                    <button
-                      onClick={() => handleResetDays(period)}
-                      title="Restaurar cálculo automático"
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-[#475569] transition-colors hover:bg-white/10 hover:text-[#F59E0B]"
-                    >
-                      <RotateCcw className="h-3 w-3" />
-                    </button>
-                  )}
+                <div className="flex justify-center">
+                  <Input
+                    type="number"
+                    min="0"
+                    max="31"
+                    value={getWorkingDays(period)}
+                    onChange={(e) => handleUpdateDays(period, e.target.value)}
+                    className="h-8 w-20 border-[#0296DF]/30 bg-[#0296DF]/10 text-center text-sm font-semibold text-[#0296DF] focus:border-[#0296DF] focus:bg-white/10"
+                  />
                 </div>
 
                 {/* Eliminar */}
@@ -215,21 +176,6 @@ export function PeriodManager() {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="mt-3 flex items-center gap-4 text-xs text-[#475569]">
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#0296DF]/60" />
-          <span><strong className="text-[#0296DF]">auto</strong> — calculado desde fechas</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-2 rounded-full bg-[#F59E0B]" />
-          <span><strong className="text-[#F59E0B]">custom</strong> — ajustado manualmente (feriados)</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <RotateCcw className="h-3 w-3" />
-          <span>restaura el cálculo automático</span>
-        </div>
-      </div>
     </div>
   );
 }
