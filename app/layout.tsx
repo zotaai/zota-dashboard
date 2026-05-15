@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Inter, Poppins } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import { StoreProvider } from '@/lib/store'
 import './globals.css'
 
@@ -41,7 +40,6 @@ export default function RootLayout({
         <StoreProvider>
           {children}
         </StoreProvider>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
