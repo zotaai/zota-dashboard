@@ -1,0 +1,136 @@
+"use client";
+
+import { Plus, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Activity } from "@/types";
+
+interface ActivityTableProps {
+  activities: Activity[];
+  areas: string[];
+  onAdd: () => void;
+  onUpdate: (id: string, field: keyof Activity, value: string | number) => void;
+  onDelete: (id: string) => void;
+}
+
+export function ActivityTable({
+  activities,
+  areas,
+  onAdd,
+  onUpdate,
+  onDelete,
+}: ActivityTableProps) {
+  return (
+    <div className="mb-6">
+      <div className="mb-3 flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
+            Registro de Dedicaciones
+          </h3>
+          <p className="text-xs text-[#64748B]">
+            Registre las actividades realizadas durante el período
+          </p>
+        </div>
+        <Button
+          onClick={onAdd}
+          size="sm"
+          className="h-8 bg-[#0296DF] text-xs font-medium text-white hover:bg-[#0284c7]"
+        >
+          <Plus className="mr-1 h-3.5 w-3.5" />
+          Añadir
+        </Button>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-white/10">
+        <div className="grid grid-cols-[1fr_200px_100px_44px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+            Descripción de la Actividad
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+            Área
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+            Días
+          </span>
+          <span />
+        </div>
+
+        <div className="divide-y divide-white/5">
+          {activities.length === 0 ? (
+            <div className="px-4 py-8 text-center text-sm text-[#475569]">
+              No hay actividades registradas. Haga clic en{" "}
+              <span className="text-[#0296DF]">Añadir</span> para comenzar.
+            </div>
+          ) : (
+            activities.map((activity) => (
+              <div
+                key={activity.id}
+                className="grid grid-cols-[1fr_200px_100px_44px] items-center gap-2 px-4 py-2 transition-colors hover:bg-white/[0.02]"
+              >
+                <Input
+                  placeholder="Descripción de la actividad"
+                  value={activity.description}
+                  onChange={(e) =>
+                    onUpdate(activity.id, "description", e.target.value)
+                  }
+                  className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10"
+                />
+                <Select
+                  value={activity.area}
+                  onValueChange={(v) => onUpdate(activity.id, "area", v)}
+                >
+                  <SelectTrigger className="h-8 border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF]">
+                    <SelectValue placeholder="Seleccionar" />
+                  </SelectTrigger>
+                  <SelectContent className="border-white/10 bg-[#0F172A]">
+                    {areas.map((area) => (
+                      <SelectItem
+                        key={area}
+                        value={area}
+                        className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
+                      >
+                        {area}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  placeholder="0"
+                  value={activity.days || ""}
+                  onChange={(e) =>
+                    onUpdate(
+                      activity.id,
+                      "days",
+                      parseFloat(e.target.value) || 0
+                    )
+                  }
+                  className="h-8 border-transparent bg-white/5 text-center text-sm text-white focus:border-[#0296DF] focus:bg-white/10"
+                />
+                <div className="flex justify-center">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDelete(activity.id)}
+                    className="h-7 w-7 text-[#64748B] hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
