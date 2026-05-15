@@ -8,6 +8,7 @@ export interface BillingPeriod {
   name: string;
   startDate: string;
   endDate: string;
+  workingDays?: number | null; // null = usar cálculo automático
 }
 
 export interface Project {

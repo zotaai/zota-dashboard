@@ -5,10 +5,11 @@ import type { AppState, User, BillingPeriod, Report, Activity, Expense, Project 
 
 function mapPeriod(r: Record<string, unknown>): BillingPeriod {
   return {
-    id:        r.id as string,
-    name:      r.name as string,
-    startDate: r.start_date as string,
-    endDate:   r.end_date as string,
+    id:          r.id as string,
+    name:        r.name as string,
+    startDate:   r.start_date as string,
+    endDate:     r.end_date as string,
+    workingDays: r.working_days != null ? Number(r.working_days) : null,
   };
 }
 
@@ -98,14 +99,21 @@ export async function deleteUser(id: string) {
 
 export async function addPeriod(period: BillingPeriod) {
   const { error } = await supabase.from("periods").insert({
-    id: period.id, name: period.name, start_date: period.startDate, end_date: period.endDate,
+    id: period.id, name: period.name,
+    start_date: period.startDate, end_date: period.endDate,
+    working_days: period.workingDays ?? null,
   });
   if (error) throw error;
 }
 
 export async function updatePeriod(period: BillingPeriod) {
   const { error } = await supabase.from("periods")
-    .update({ name: period.name, start_date: period.startDate, end_date: period.endDate })
+    .update({
+      name: period.name,
+      start_date: period.startDate,
+      end_date: period.endDate,
+      working_days: period.workingDays ?? null,
+    })
     .eq("id", period.id);
   if (error) throw error;
 }

@@ -24,7 +24,11 @@ export function ReportTab() {
 
   const targetDays = useMemo(() => {
     const p = state.periods.find((x) => x.id === selectedPeriod);
-    return p ? calculateWorkingDays(p.startDate, p.endDate) : 0;
+    if (!p) return 0;
+    // Use manual override if set (feriados), otherwise auto-calculate
+    return p.workingDays != null
+      ? p.workingDays
+      : calculateWorkingDays(p.startDate, p.endDate);
   }, [state.periods, selectedPeriod]);
 
   const totalRecordedDays = useMemo(

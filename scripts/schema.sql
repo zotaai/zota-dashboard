@@ -12,11 +12,12 @@ create table if not exists public.users (
 );
 
 create table if not exists public.periods (
-  id          text primary key,
-  name        text not null,
-  start_date  text not null,
-  end_date    text not null,
-  created_at  timestamptz default now()
+  id            text primary key,
+  name          text not null,
+  start_date    text not null,
+  end_date      text not null,
+  working_days  integer default null, -- null = auto-calculated; set manually to override holidays
+  created_at    timestamptz default now()
 );
 
 create table if not exists public.clients (
