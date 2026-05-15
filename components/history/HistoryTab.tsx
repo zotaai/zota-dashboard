@@ -35,6 +35,7 @@ export function HistoryTab() {
 
   const [filterType,  setFilterType]  = useState<FilterType>("quincena");
   const [filterValue, setFilterValue] = useState<string>("all");
+  const [filterUser,  setFilterUser]  = useState<string>("all");
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   const getPeriod = (id: string) => state.periods.find(p => p.id === id);
@@ -45,6 +46,12 @@ export function HistoryTab() {
     () => state.reports.filter(r => r.status === "submitted"),
     [state.reports]
   );
+
+  // Users that actually appear in submitted reports
+  const activeUsers = useMemo(() => {
+    const ids = new Set(submitted.map(r => r.userId));
+    return state.users.filter(u => ids.has(u.id));
+  }, [submitted, state.users]);
 
   // ── Build filter options from periods that actually have submitted reports ─
   const filterOptions = useMemo(() => {
@@ -109,11 +116,14 @@ export function HistoryTab() {
     }
   }, [filterType, submitted, state.periods]);
 
-  // ── Apply filter ───────────────────────────────────────────────────────────
+  // ── Apply filters ──────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
-    if (filterValue === "all") return submitted;
-
     return submitted.filter(r => {
+      // User filter
+      if (filterUser !== "all" && r.userId !== filterUser) return false;
+
+      // Period filter
+      if (filterValue === "all") return true;
       const p = getPeriod(r.periodId);
       if (!p) return false;
       const d = localDate(p);
@@ -126,7 +136,7 @@ export function HistoryTab() {
         case "año":       return `${d.getFullYear()}` === filterValue;
       }
     });
-  }, [filterValue, filterType, submitted, state.periods]);
+  }, [filterValue, filterType, filterUser, submitted, state.periods]);
 
   // ── Flatten rows ───────────────────────────────────────────────────────────
   const activityRows = useMemo(() =>
@@ -155,6 +165,8 @@ export function HistoryTab() {
     setFilterValue("all");
   };
 
+  const handleUserChange = (v: string) => setFilterUser(v);
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6 p-5">
@@ -169,6 +181,19 @@ export function HistoryTab() {
         </p>
 
         <div className="flex flex-wrap gap-3">
+          {/* User filter */}
+          <Select value={filterUser} onValueChange={handleUserChange}>
+            <SelectTrigger className="h-9 w-48 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
+              <SelectValue placeholder="Todos los usuarios" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los usuarios</SelectItem>
+              {activeUsers.map(u => (
+                <SelectItem key={u.id} value={u.id}>{u.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           {/* Filter type */}
           <Select value={filterType} onValueChange={handleTypeChange}>
             <SelectTrigger className="h-9 w-40 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
