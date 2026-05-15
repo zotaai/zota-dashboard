@@ -3,6 +3,14 @@
 import { useState, useMemo, useEffect } from "react";
 import { Send, Download, FileSpreadsheet, Save, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useStore } from "@/lib/store";
 import { calculateWorkingDays } from "@/lib/calculations";
 import { exportReportToPDF } from "@/lib/export-pdf";
@@ -24,6 +32,7 @@ export function ReportTab() {
   const [lastSaved,      setLastSaved]      = useState<string | null>(null);
   const [saving,         setSaving]         = useState(false);
   const [submitting,     setSubmitting]     = useState(false);
+  const [successModal,   setSuccessModal]   = useState<"draft" | "submitted" | null>(null);
 
   // ── Find existing report for this user + period ────────────────────────────
   const existingReport = useMemo(
@@ -137,6 +146,7 @@ export function ReportTab() {
 
     await dispatch({ type: "SAVE_DRAFT", payload: buildReport("draft", id) });
     setSaving(false);
+    setSuccessModal("draft");
   };
 
   // ── Submit final report ────────────────────────────────────────────────────
@@ -152,6 +162,7 @@ export function ReportTab() {
     await dispatch({ type: "SUBMIT_REPORT", payload: id });
 
     setSubmitting(false);
+    setSuccessModal("submitted");
   };
 
   // ── Export helpers ─────────────────────────────────────────────────────────
@@ -333,6 +344,57 @@ export function ReportTab() {
           </Button>
         </div>
       )}
+
+      {/* ── Success modals ── */}
+      <Dialog open={successModal === "draft"} onOpenChange={() => setSuccessModal(null)}>
+        <DialogContent className="border border-white/10 bg-[#0F172A] text-white sm:max-w-sm">
+          <DialogHeader className="items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0296DF]/15">
+              <Save className="h-6 w-6 text-[#0296DF]" />
+            </div>
+            <DialogTitle className="text-base font-semibold text-white">
+              Avance guardado
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm text-[#94A3B8]">
+              Tu progreso fue guardado correctamente. Puedes continuar registrando
+              actividades y volver a guardar cuando quieras.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-2">
+            <Button
+              onClick={() => setSuccessModal(null)}
+              className="w-full bg-[#0296DF] text-sm font-medium text-white hover:bg-[#0284c7]"
+            >
+              Aceptar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={successModal === "submitted"} onOpenChange={() => setSuccessModal(null)}>
+        <DialogContent className="border border-white/10 bg-[#0F172A] text-white sm:max-w-sm">
+          <DialogHeader className="items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#10B981]/15">
+              <CheckCircle2 className="h-6 w-6 text-[#10B981]" />
+            </div>
+            <DialogTitle className="text-base font-semibold text-white">
+              Reporte enviado
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm text-[#94A3B8]">
+              Se registró el reporte quincenal correctamente. Ya no podrás
+              realizar cambios en este período.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-2">
+            <Button
+              onClick={() => setSuccessModal(null)}
+              className="w-full bg-[#10B981] text-sm font-medium text-white hover:bg-[#059669]"
+            >
+              Aceptar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
