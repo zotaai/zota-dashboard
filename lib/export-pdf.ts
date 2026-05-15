@@ -103,14 +103,14 @@ export async function exportReportToPDF(
   autoTable(doc, {
     startY: y,
     margin: { left: margin, right: margin },
-    head: [["Descripción de la Actividad", "Área", "Días"]],
-    body: report.activities.map((a) => [a.description, a.area, formatDays(a.days)]),
-    foot: [[{ content: "TOTAL", colSpan: 2, styles: { halign: "right" } }, formatDays(report.totalDays)]],
+    head: [["Descripción de la Actividad", "Cliente", "Proyecto", "Días"]],
+    body: report.activities.map((a) => [a.description, a.client, a.project, formatDays(a.days)]),
+    foot: [[{ content: "TOTAL", colSpan: 3, styles: { halign: "right" } }, formatDays(report.totalDays)]],
     headStyles: { fillColor: BRAND.navy, textColor: BRAND.white, fontStyle: "bold", fontSize: 8 },
     bodyStyles: { fontSize: 8, textColor: BRAND.text },
     footStyles: { fillColor: BRAND.blue, textColor: BRAND.white, fontStyle: "bold", fontSize: 8 },
     alternateRowStyles: { fillColor: BRAND.lightGray },
-    columnStyles: { 2: { halign: "center", cellWidth: 20 } },
+    columnStyles: { 3: { halign: "center", cellWidth: 20 } },
   });
 
   y = (doc as unknown as JsPDFWithAutoTable).lastAutoTable.finalY + 10;

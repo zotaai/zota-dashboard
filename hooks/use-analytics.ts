@@ -3,7 +3,7 @@ import { useStore } from "@/lib/store";
 import type { Report } from "@/types";
 
 export interface AreaDataPoint {
-  area: string;
+  area: string;  // kept as "area" for chart compatibility
   days: number;
   percentage: number;
 }
@@ -29,31 +29,34 @@ export function useAnalytics(): AnalyticsData {
   const { state } = useStore();
 
   return useMemo(() => {
-    const { reports, periods, areas } = state;
+    const { reports, periods, clients, projects: _projects } = state;
+    void _projects; // not used directly — analytics aggregates by client name from activities
 
     const totalReports = reports.length;
     const totalDays = reports.reduce((s, r) => s + r.totalDays, 0);
     const totalExpenses = reports.reduce((s, r) => s + r.totalExpenses, 0);
     const avgDaysPerReport = totalReports > 0 ? totalDays / totalReports : 0;
 
-    // Area distribution across all activities in all reports
-    const areaDays: Record<string, number> = {};
-    for (const area of areas) areaDays[area] = 0;
+    // Distribution by CLIENT across all activities
+    const clientDays: Record<string, number> = {};
+    for (const c of clients) clientDays[c] = 0;
     for (const report of reports) {
       for (const act of report.activities) {
-        areaDays[act.area] = (areaDays[act.area] ?? 0) + act.days;
+        if (act.client) {
+          clientDays[act.client] = (clientDays[act.client] ?? 0) + act.days;
+        }
       }
     }
-    const areaDistribution: AreaDataPoint[] = Object.entries(areaDays)
+    const areaDistribution: AreaDataPoint[] = Object.entries(clientDays)
       .filter(([, d]) => d > 0)
-      .map(([area, days]) => ({
-        area,
+      .map(([client, days]) => ({
+        area: client,  // chart uses "area" key internally
         days,
         percentage: totalDays > 0 ? Math.round((days / totalDays) * 100) : 0,
       }))
       .sort((a, b) => b.days - a.days);
 
-    // Trend by period (only periods that have submitted reports)
+    // Trend by period
     const periodMap: Record<
       string,
       { days: number; expenses: number; reports: number; name: string }
@@ -72,7 +75,7 @@ export function useAnalytics(): AnalyticsData {
     const periodTrend: PeriodDataPoint[] = Object.values(periodMap)
       .filter((p) => p.reports > 0)
       .map((p) => ({
-        period: p.name.split(" ").slice(0, 3).join(" "), // shorten label
+        period: p.name.split(" ").slice(0, 3).join(" "),
         days: p.days,
         expenses: p.expenses,
         reports: p.reports,

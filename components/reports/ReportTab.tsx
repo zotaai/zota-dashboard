@@ -47,7 +47,7 @@ export function ReportTab() {
   const addActivity = () =>
     setActivities((prev) => [
       ...prev,
-      { id: Date.now().toString(), description: "", area: "", days: 0 },
+      { id: Date.now().toString(), description: "", client: "", project: "", days: 0 },
     ]);
 
   const updateActivity = (
@@ -176,7 +176,8 @@ export function ReportTab() {
       <div className="mt-5">
         <ActivityTable
           activities={activities}
-          areas={state.areas}
+          clients={state.clients}
+          projects={state.projects}
           onAdd={addActivity}
           onUpdate={updateActivity}
           onDelete={deleteActivity}

@@ -1,11 +1,10 @@
 "use client";
 
-import { FileText, BarChart3, History, Settings, WifiOff, RefreshCw, Loader2, Database } from "lucide-react";
+import { FileText, BarChart3, Settings, WifiOff, RefreshCw, Loader2, Database } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ReportTab } from "@/components/reports/ReportTab";
 import { AnalyticsTab } from "@/components/analytics/AnalyticsTab";
-import { ReportHistory } from "@/components/history/ReportHistory";
 import { SettingsTab } from "@/components/settings/SettingsTab";
 import { useStore } from "@/lib/store";
 import { isConfigured } from "@/lib/supabase";
@@ -17,7 +16,7 @@ function LoadingScreen() {
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-[#0296DF]" />
-      <p className="text-sm text-[#64748B]">Cargando datos desde Supabase…</p>
+      <p className="text-sm text-[#64748B]">Iniciando aplicación…</p>
     </div>
   );
 }
@@ -85,10 +84,6 @@ export function Dashboard() {
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">ANALYTICS</span>
               </TabsTrigger>
-              <TabsTrigger value="history"   className={`${TAB_CLASS} border-r border-white/10`}>
-                <History className="h-4 w-4" />
-                <span className="hidden sm:inline">HISTORIAL</span>
-              </TabsTrigger>
               <TabsTrigger value="settings"  className={`${TAB_CLASS} rounded-tr-xl`}>
                 <Settings className="h-4 w-4" />
                 <span className="hidden sm:inline">CONFIGURACIÓN</span>
@@ -97,7 +92,6 @@ export function Dashboard() {
 
             <TabsContent value="reports"   className="mt-0"><ReportTab /></TabsContent>
             <TabsContent value="analytics" className="mt-0"><AnalyticsTab /></TabsContent>
-            <TabsContent value="history"   className="mt-0"><ReportHistory /></TabsContent>
             <TabsContent value="settings"  className="mt-0"><SettingsTab /></TabsContent>
           </Tabs>
         )}

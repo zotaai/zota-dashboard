@@ -1,5 +1,5 @@
 -- ============================================================
--- ZOTA AI — Supabase Schema
+-- ZOTA AI — Supabase Schema v2
 -- Ejecutar en: Supabase Dashboard → SQL Editor → New query
 -- ============================================================
 
@@ -19,8 +19,14 @@ create table if not exists public.periods (
   created_at  timestamptz default now()
 );
 
-create table if not exists public.areas (
+create table if not exists public.clients (
   name  text primary key
+);
+
+create table if not exists public.projects (
+  name         text not null,
+  client_name  text not null references public.clients(name) on delete cascade,
+  primary key (name, client_name)
 );
 
 create table if not exists public.reports (
@@ -33,12 +39,12 @@ create table if not exists public.reports (
   created_at      timestamptz default now()
 );
 
--- Normalizado: activities y expenses en tablas propias (no JSON en celda)
 create table if not exists public.activities (
   id           text primary key,
   report_id    text not null references public.reports(id) on delete cascade,
   description  text not null,
-  area         text not null,
+  client       text not null default '',
+  project      text not null default '',
   days         numeric not null
 );
 
@@ -48,25 +54,26 @@ create table if not exists public.expenses (
   description  text not null,
   amount       numeric not null default 0,
   file_name    text,
-  file_data    text  -- base64; para archivos grandes considera Supabase Storage
+  file_data    text
 );
 
 -- ── Row Level Security ────────────────────────────────────────
--- App pública sin auth → anon puede hacer todo.
+-- App pública sin auth → anon puede leer y escribir.
 -- Cuando agregues autenticación, reemplaza estas políticas.
 
-alter table public.users      enable row level security;
-alter table public.periods     enable row level security;
-alter table public.areas       enable row level security;
-alter table public.reports     enable row level security;
-alter table public.activities  enable row level security;
-alter table public.expenses    enable row level security;
+alter table public.users       enable row level security;
+alter table public.periods      enable row level security;
+alter table public.clients      enable row level security;
+alter table public.projects     enable row level security;
+alter table public.reports      enable row level security;
+alter table public.activities   enable row level security;
+alter table public.expenses     enable row level security;
 
 do $$
 declare
   t text;
 begin
-  foreach t in array array['users','periods','areas','reports','activities','expenses'] loop
+  foreach t in array array['users','periods','clients','projects','reports','activities','expenses'] loop
     execute format(
       'create policy "anon_all" on public.%I for all to anon using (true) with check (true)', t
     );
@@ -74,19 +81,20 @@ begin
 end;
 $$;
 
--- ── Índices para queries frecuentes ──────────────────────────
+-- ── Índices ───────────────────────────────────────────────────
 
 create index if not exists idx_reports_user_id    on public.reports(user_id);
 create index if not exists idx_reports_period_id  on public.reports(period_id);
 create index if not exists idx_activities_report  on public.activities(report_id);
 create index if not exists idx_expenses_report    on public.expenses(report_id);
+create index if not exists idx_projects_client    on public.projects(client_name);
 
--- ── Habilitar Realtime para todas las tablas ──────────────────
--- (también puedes hacerlo desde Dashboard → Database → Replication)
+-- ── Realtime ──────────────────────────────────────────────────
 
 alter publication supabase_realtime add table public.users;
 alter publication supabase_realtime add table public.periods;
-alter publication supabase_realtime add table public.areas;
+alter publication supabase_realtime add table public.clients;
+alter publication supabase_realtime add table public.projects;
 alter publication supabase_realtime add table public.reports;
 alter publication supabase_realtime add table public.activities;
 alter publication supabase_realtime add table public.expenses;
@@ -105,11 +113,14 @@ insert into public.periods (id, name, start_date, end_date) values
   ('3', '1ra Quincena Junio 2026', '2026-06-01', '2026-06-15')
 on conflict (id) do nothing;
 
-insert into public.areas (name) values
-  ('Proyectos'),
-  ('Administración'),
-  ('Marketing'),
-  ('Contabilidad'),
-  ('Comercial / Ventas'),
-  ('I+D')
+insert into public.clients (name) values
+  ('Zota AI'),
+  ('Cliente Externo 1'),
+  ('Cliente Externo 2')
 on conflict (name) do nothing;
+
+insert into public.projects (name, client_name) values
+  ('Proyecto Alpha', 'Zota AI'),
+  ('Proyecto Beta',  'Zota AI'),
+  ('Proyecto Gamma', 'Cliente Externo 1')
+on conflict (name, client_name) do nothing;

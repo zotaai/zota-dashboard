@@ -10,11 +10,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { AppState, User, BillingPeriod, Report } from "@/types";
+import type { AppState, User, BillingPeriod, Report, Project } from "@/types";
 import { supabase, isConfigured } from "./supabase";
 import * as db from "./supabase-api";
 
-// ── Fallback state (used when Supabase is not configured) ─────────────────────
+// ── Fallback state ────────────────────────────────────────────────────────────
 
 const INITIAL_STATE: AppState = {
   users: [
@@ -28,40 +28,73 @@ const INITIAL_STATE: AppState = {
     { id: "3", name: "1ra Quincena Junio 2026", startDate: "2026-06-01", endDate: "2026-06-15" },
   ],
   reports: [],
-  areas: ["Proyectos", "Administración", "Marketing", "Contabilidad", "Comercial / Ventas", "I+D"],
+  clients: ["Zota AI", "Cliente Externo 1", "Cliente Externo 2"],
+  projects: [
+    { name: "Proyecto Alpha", clientName: "Zota AI" },
+    { name: "Proyecto Beta",  clientName: "Zota AI" },
+    { name: "Proyecto Gamma", clientName: "Cliente Externo 1" },
+  ],
 };
 
-const STORAGE_KEY = "zota-dashboard-v1";
+const STORAGE_KEY = "zota-dashboard-v3";
 
 // ── Reducer ───────────────────────────────────────────────────────────────────
 
 type Action =
-  | { type: "HYDRATE"; payload: AppState }
-  | { type: "ADD_PERIOD"; payload: BillingPeriod }
-  | { type: "UPDATE_PERIOD"; payload: BillingPeriod }
-  | { type: "DELETE_PERIOD"; payload: string }
-  | { type: "ADD_USER"; payload: User }
-  | { type: "UPDATE_USER"; payload: User }
-  | { type: "DELETE_USER"; payload: string }
-  | { type: "ADD_AREA"; payload: string }
-  | { type: "DELETE_AREA"; payload: string }
-  | { type: "SUBMIT_REPORT"; payload: Report }
-  | { type: "DELETE_REPORT"; payload: string };
+  | { type: "HYDRATE";        payload: AppState }
+  | { type: "ADD_PERIOD";     payload: BillingPeriod }
+  | { type: "UPDATE_PERIOD";  payload: BillingPeriod }
+  | { type: "DELETE_PERIOD";  payload: string }
+  | { type: "ADD_USER";       payload: User }
+  | { type: "UPDATE_USER";    payload: User }
+  | { type: "DELETE_USER";    payload: string }
+  | { type: "ADD_CLIENT";     payload: string }
+  | { type: "DELETE_CLIENT";  payload: string }
+  | { type: "ADD_PROJECT";    payload: Project }
+  | { type: "DELETE_PROJECT"; payload: Project }
+  | { type: "SUBMIT_REPORT";  payload: Report }
+  | { type: "DELETE_REPORT";  payload: string };
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
-    case "HYDRATE":        return action.payload;
-    case "ADD_PERIOD":     return { ...state, periods: [...state.periods, action.payload] };
-    case "UPDATE_PERIOD":  return { ...state, periods: state.periods.map(p => p.id === action.payload.id ? action.payload : p) };
-    case "DELETE_PERIOD":  return { ...state, periods: state.periods.filter(p => p.id !== action.payload) };
-    case "ADD_USER":       return { ...state, users: [...state.users, action.payload] };
-    case "UPDATE_USER":    return { ...state, users: state.users.map(u => u.id === action.payload.id ? action.payload : u) };
-    case "DELETE_USER":    return { ...state, users: state.users.filter(u => u.id !== action.payload) };
-    case "ADD_AREA":       return { ...state, areas: [...state.areas, action.payload] };
-    case "DELETE_AREA":    return { ...state, areas: state.areas.filter(a => a !== action.payload) };
-    case "SUBMIT_REPORT":  return { ...state, reports: [...state.reports, action.payload] };
-    case "DELETE_REPORT":  return { ...state, reports: state.reports.filter(r => r.id !== action.payload) };
-    default:               return state;
+    case "HYDRATE":
+      return action.payload;
+    case "ADD_PERIOD":
+      return { ...state, periods: [...state.periods, action.payload] };
+    case "UPDATE_PERIOD":
+      return { ...state, periods: state.periods.map(p => p.id === action.payload.id ? action.payload : p) };
+    case "DELETE_PERIOD":
+      return { ...state, periods: state.periods.filter(p => p.id !== action.payload) };
+    case "ADD_USER":
+      return { ...state, users: [...state.users, action.payload] };
+    case "UPDATE_USER":
+      return { ...state, users: state.users.map(u => u.id === action.payload.id ? action.payload : u) };
+    case "DELETE_USER":
+      return { ...state, users: state.users.filter(u => u.id !== action.payload) };
+    case "ADD_CLIENT":
+      return { ...state, clients: [...state.clients, action.payload] };
+    case "DELETE_CLIENT":
+      // Also remove all projects belonging to this client
+      return {
+        ...state,
+        clients: state.clients.filter(c => c !== action.payload),
+        projects: state.projects.filter(p => p.clientName !== action.payload),
+      };
+    case "ADD_PROJECT":
+      return { ...state, projects: [...state.projects, action.payload] };
+    case "DELETE_PROJECT":
+      return {
+        ...state,
+        projects: state.projects.filter(
+          p => !(p.name === action.payload.name && p.clientName === action.payload.clientName)
+        ),
+      };
+    case "SUBMIT_REPORT":
+      return { ...state, reports: [...state.reports, action.payload] };
+    case "DELETE_REPORT":
+      return { ...state, reports: state.reports.filter(r => r.id !== action.payload) };
+    default:
+      return state;
   }
 }
 
@@ -85,7 +118,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [syncing,   setSyncing]   = useState(false);
   const [connected, setConnected] = useState(false);
 
-  // ── Fetch and hydrate from Supabase ────────────────────────────────────────
   const hydrate = useCallback(async () => {
     if (!isConfigured) return;
     try {
@@ -99,24 +131,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // ── Initial load ───────────────────────────────────────────────────────────
   useEffect(() => {
     async function boot() {
-      // Immediately show cached data while Supabase loads
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         try { localDispatch({ type: "HYDRATE", payload: JSON.parse(cached) }); } catch {}
       }
-
       await hydrate();
       setLoading(false);
     }
     boot();
   }, [hydrate]);
 
-  // ── Real-time subscriptions ────────────────────────────────────────────────
-  // Re-hydrate whenever any table changes (another user made a write).
-  // We debounce slightly to batch rapid consecutive events.
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -131,7 +157,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .channel("zota-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "users" },      debouncedHydrate)
       .on("postgres_changes", { event: "*", schema: "public", table: "periods" },     debouncedHydrate)
-      .on("postgres_changes", { event: "*", schema: "public", table: "areas" },       debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "clients" },     debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "projects" },    debouncedHydrate)
       .on("postgres_changes", { event: "*", schema: "public", table: "reports" },     debouncedHydrate)
       .on("postgres_changes", { event: "*", schema: "public", table: "activities" },  debouncedHydrate)
       .on("postgres_changes", { event: "*", schema: "public", table: "expenses" },    debouncedHydrate)
@@ -143,36 +170,34 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     };
   }, [hydrate]);
 
-  // ── Persist to localStorage when not connected to Supabase ────────────────
   useEffect(() => {
     if (!loading && !isConfigured) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
   }, [state, loading]);
 
-  // ── Dispatch: optimistic update + background Supabase write ───────────────
   const dispatch = useCallback(async (action: Action) => {
-    localDispatch(action); // instant — UI never waits
-
+    localDispatch(action);
     if (!isConfigured) return;
 
     setSyncing(true);
     try {
       switch (action.type) {
-        case "ADD_USER":      await db.addUser(action.payload);      break;
-        case "UPDATE_USER":   await db.updateUser(action.payload);   break;
-        case "DELETE_USER":   await db.deleteUser(action.payload);   break;
-        case "ADD_PERIOD":    await db.addPeriod(action.payload);    break;
-        case "UPDATE_PERIOD": await db.updatePeriod(action.payload); break;
-        case "DELETE_PERIOD": await db.deletePeriod(action.payload); break;
-        case "ADD_AREA":      await db.addArea(action.payload);      break;
-        case "DELETE_AREA":   await db.deleteArea(action.payload);   break;
-        case "SUBMIT_REPORT": await db.submitReport(action.payload); break;
-        case "DELETE_REPORT": await db.deleteReport(action.payload); break;
+        case "ADD_USER":       await db.addUser(action.payload);       break;
+        case "UPDATE_USER":    await db.updateUser(action.payload);    break;
+        case "DELETE_USER":    await db.deleteUser(action.payload);    break;
+        case "ADD_PERIOD":     await db.addPeriod(action.payload);     break;
+        case "UPDATE_PERIOD":  await db.updatePeriod(action.payload);  break;
+        case "DELETE_PERIOD":  await db.deletePeriod(action.payload);  break;
+        case "ADD_CLIENT":     await db.addClient(action.payload);     break;
+        case "DELETE_CLIENT":  await db.deleteClient(action.payload);  break;
+        case "ADD_PROJECT":    await db.addProject(action.payload);    break;
+        case "DELETE_PROJECT": await db.deleteProject(action.payload); break;
+        case "SUBMIT_REPORT":  await db.submitReport(action.payload);  break;
+        case "DELETE_REPORT":  await db.deleteReport(action.payload);  break;
       }
     } catch (err) {
       console.error("[Supabase] write error:", err);
-      // Optimistic update stays — next real-time hydration will correct any inconsistency
     } finally {
       setSyncing(false);
     }

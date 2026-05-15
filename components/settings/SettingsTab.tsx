@@ -2,7 +2,8 @@
 
 import { PeriodManager } from "./PeriodManager";
 import { UserManager } from "./UserManager";
-import { AreaManager } from "./AreaManager";
+import { ClientManager } from "./ClientManager";
+import { ProjectManager } from "./ProjectManager";
 import { Separator } from "@/components/ui/separator";
 
 export function SettingsTab() {
@@ -12,7 +13,9 @@ export function SettingsTab() {
       <Separator className="bg-white/10" />
       <UserManager />
       <Separator className="bg-white/10" />
-      <AreaManager />
+      <ClientManager />
+      <Separator className="bg-white/10" />
+      <ProjectManager />
     </div>
   );
 }

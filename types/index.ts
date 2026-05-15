@@ -10,10 +10,16 @@ export interface BillingPeriod {
   endDate: string;
 }
 
+export interface Project {
+  name: string;
+  clientName: string;
+}
+
 export interface Activity {
   id: string;
   description: string;
-  area: string;
+  client: string;
+  project: string;
   days: number;
 }
 
@@ -40,5 +46,6 @@ export interface AppState {
   users: User[];
   periods: BillingPeriod[];
   reports: Report[];
-  areas: string[];
+  clients: string[];
+  projects: Project[];
 }

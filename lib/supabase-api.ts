@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { AppState, User, BillingPeriod, Report, Activity, Expense } from "@/types";
+import type { AppState, User, BillingPeriod, Report, Activity, Expense, Project } from "@/types";
 
 // ── Mappers: DB (snake_case) → App (camelCase) ────────────────────────────────
 
@@ -16,7 +16,8 @@ function mapActivity(r: Record<string, unknown>): Activity {
   return {
     id:          r.id as string,
     description: r.description as string,
-    area:        r.area as string,
+    client:      (r.client as string) ?? "",
+    project:     (r.project as string) ?? "",
     days:        Number(r.days),
   };
 }
@@ -47,26 +48,32 @@ function mapReport(r: Record<string, unknown>): Report {
 // ── Read all data (single round-trip per table, parallel) ─────────────────────
 
 export async function fetchAllData(): Promise<AppState> {
-  const [usersRes, periodsRes, areasRes, reportsRes] = await Promise.all([
+  const [usersRes, periodsRes, clientsRes, projectsRes, reportsRes] = await Promise.all([
     supabase.from("users").select("*").order("name"),
     supabase.from("periods").select("*").order("start_date"),
-    supabase.from("areas").select("name").order("name"),
+    supabase.from("clients").select("name").order("name"),
+    supabase.from("projects").select("name, client_name").order("client_name").order("name"),
     supabase
       .from("reports")
-      .select("*, activities(id,description,area,days), expenses(id,description,amount,file_name,file_data)")
+      .select("*, activities(id,description,client,project,days), expenses(id,description,amount,file_name,file_data)")
       .order("submitted_at", { ascending: false }),
   ]);
 
-  if (usersRes.error)   throw usersRes.error;
-  if (periodsRes.error) throw periodsRes.error;
-  if (areasRes.error)   throw areasRes.error;
-  if (reportsRes.error) throw reportsRes.error;
+  if (usersRes.error)    throw usersRes.error;
+  if (periodsRes.error)  throw periodsRes.error;
+  if (clientsRes.error)  throw clientsRes.error;
+  if (projectsRes.error) throw projectsRes.error;
+  if (reportsRes.error)  throw reportsRes.error;
 
   return {
-    users:   (usersRes.data   ?? []) as User[],
-    periods: (periodsRes.data ?? []).map(mapPeriod),
-    areas:   (areasRes.data   ?? []).map(r => r.name as string),
-    reports: (reportsRes.data ?? []).map(r => mapReport(r as Record<string, unknown>)),
+    users:    (usersRes.data    ?? []) as User[],
+    periods:  (periodsRes.data  ?? []).map(mapPeriod),
+    clients:  (clientsRes.data  ?? []).map(r => r.name as string),
+    projects: (projectsRes.data ?? []).map(r => ({
+      name:       r.name as string,
+      clientName: r.client_name as string,
+    })),
+    reports:  (reportsRes.data  ?? []).map(r => mapReport(r as Record<string, unknown>)),
   };
 }
 
@@ -108,15 +115,33 @@ export async function deletePeriod(id: string) {
   if (error) throw error;
 }
 
-// ── Areas ─────────────────────────────────────────────────────────────────────
+// ── Clients ───────────────────────────────────────────────────────────────────
 
-export async function addArea(name: string) {
-  const { error } = await supabase.from("areas").insert({ name });
+export async function addClient(name: string) {
+  const { error } = await supabase.from("clients").insert({ name });
   if (error) throw error;
 }
 
-export async function deleteArea(name: string) {
-  const { error } = await supabase.from("areas").delete().eq("name", name);
+export async function deleteClient(name: string) {
+  const { error } = await supabase.from("clients").delete().eq("name", name);
+  if (error) throw error;
+}
+
+// ── Projects ──────────────────────────────────────────────────────────────────
+
+export async function addProject(project: Project) {
+  const { error } = await supabase
+    .from("projects")
+    .insert({ name: project.name, client_name: project.clientName });
+  if (error) throw error;
+}
+
+export async function deleteProject(project: Project) {
+  const { error } = await supabase
+    .from("projects")
+    .delete()
+    .eq("name", project.name)
+    .eq("client_name", project.clientName);
   if (error) throw error;
 }
 
@@ -136,7 +161,8 @@ export async function submitReport(report: Report) {
   if (report.activities.length > 0) {
     const { error: aErr } = await supabase.from("activities").insert(
       report.activities.map(a => ({
-        id: a.id, report_id: report.id, description: a.description, area: a.area, days: a.days,
+        id: a.id, report_id: report.id, description: a.description,
+        client: a.client, project: a.project, days: a.days,
       }))
     );
     if (aErr) throw aErr;
@@ -154,7 +180,6 @@ export async function submitReport(report: Report) {
 }
 
 export async function deleteReport(id: string) {
-  // ON DELETE CASCADE elimina activities y expenses automáticamente
   const { error } = await supabase.from("reports").delete().eq("id", id);
   if (error) throw error;
 }

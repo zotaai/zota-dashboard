@@ -72,8 +72,8 @@ export function AnalyticsTab() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <ChartCard
-          title="Distribución por Área"
-          subtitle="% de días dedicados por área en todos los reportes"
+          title="Distribución por Cliente"
+          subtitle="% de días dedicados por cliente en todos los reportes"
         >
           <AreaPieChart data={analytics.areaDistribution} />
         </ChartCard>

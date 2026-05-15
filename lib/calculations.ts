@@ -1,7 +1,16 @@
 export function calculateWorkingDays(startDate: string, endDate: string): number {
   if (!startDate || !endDate) return 0;
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+
+  // Parse as LOCAL date to avoid UTC-offset issues.
+  // new Date("YYYY-MM-DD") is treated as UTC midnight which shifts the day
+  // backward in negative-offset timezones (e.g. UTC-5 → previous calendar day).
+  const parseLocal = (s: string) => {
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  };
+
+  const start = parseLocal(startDate);
+  const end   = parseLocal(endDate);
   if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return 0;
 
   let workingDays = 0;
