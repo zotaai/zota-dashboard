@@ -1,11 +1,12 @@
 "use client";
 
-import { FileText, BarChart3, Settings, WifiOff, RefreshCw, Loader2, Database } from "lucide-react";
+import { FileText, BarChart3, Settings, WifiOff, RefreshCw, Loader2, Database, BookOpen } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 import { ReportTab } from "@/components/reports/ReportTab";
 import { AnalyticsTab } from "@/components/analytics/AnalyticsTab";
 import { SettingsTab } from "@/components/settings/SettingsTab";
+import { HistoryTab } from "@/components/history/HistoryTab";
 import { useStore } from "@/lib/store";
 import { isConfigured } from "@/lib/supabase";
 
@@ -80,6 +81,10 @@ export function Dashboard() {
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">MIS REPORTES</span>
               </TabsTrigger>
+              <TabsTrigger value="history"   className={`${TAB_CLASS} border-r border-white/10`}>
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">REPORTES</span>
+              </TabsTrigger>
               <TabsTrigger value="analytics" className={`${TAB_CLASS} border-r border-white/10`}>
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">ANALYTICS</span>
@@ -91,6 +96,7 @@ export function Dashboard() {
             </TabsList>
 
             <TabsContent value="reports"   className="mt-0"><ReportTab /></TabsContent>
+            <TabsContent value="history"   className="mt-0"><HistoryTab /></TabsContent>
             <TabsContent value="analytics" className="mt-0"><AnalyticsTab /></TabsContent>
             <TabsContent value="settings"  className="mt-0"><SettingsTab /></TabsContent>
           </Tabs>
