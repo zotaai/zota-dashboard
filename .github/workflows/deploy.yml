@@ -3,17 +3,19 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # allows manual trigger from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Only one concurrent deployment at a time
 concurrency:
   group: pages
   cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -26,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Install dependencies
@@ -35,16 +37,14 @@ jobs:
       - name: Build (static export)
         run: npm run build
         env:
-          # Base path for GitHub Pages: https://<user>.github.io/<repo-name>
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
-          # Supabase — store these in repo Settings → Secrets and variables → Actions
           NEXT_PUBLIC_SUPABASE_URL:      ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: out   # Next.js static export outputs to /out
+          path: out
 
   deploy:
     name: Deploy to GitHub Pages
