@@ -38,7 +38,9 @@ function mapReport(r: Record<string, unknown>): Report {
     id:            r.id as string,
     userId:        r.user_id as string,
     periodId:      r.period_id as string,
+    status:        (r.status as "draft" | "submitted") ?? "submitted",
     submittedAt:   r.submitted_at as string,
+    savedAt:       (r.saved_at as string) ?? null,
     totalDays:     Number(r.total_days),
     totalExpenses: Number(r.total_expenses),
     activities:    ((r.activities as unknown[]) ?? []).map(a => mapActivity(a as Record<string, unknown>)),
@@ -155,17 +157,23 @@ export async function deleteProject(project: Project) {
 
 // ── Reports ───────────────────────────────────────────────────────────────────
 
-export async function submitReport(report: Report) {
-  const { error: rErr } = await supabase.from("reports").insert({
+/** Upsert a draft report (insert or update) with all its activities & expenses */
+export async function saveDraft(report: Report) {
+  // 1. Upsert the report row
+  const { error: rErr } = await supabase.from("reports").upsert({
     id:             report.id,
     user_id:        report.userId,
     period_id:      report.periodId,
+    status:         "draft",
+    saved_at:       new Date().toISOString(),
     submitted_at:   report.submittedAt,
     total_days:     report.totalDays,
     total_expenses: report.totalExpenses,
   });
   if (rErr) throw rErr;
 
+  // 2. Replace activities (delete old → insert new)
+  await supabase.from("activities").delete().eq("report_id", report.id);
   if (report.activities.length > 0) {
     const { error: aErr } = await supabase.from("activities").insert(
       report.activities.map(a => ({
@@ -176,6 +184,8 @@ export async function submitReport(report: Report) {
     if (aErr) throw aErr;
   }
 
+  // 3. Replace expenses (delete old → insert new)
+  await supabase.from("expenses").delete().eq("report_id", report.id);
   if (report.expenses.length > 0) {
     const { error: eErr } = await supabase.from("expenses").insert(
       report.expenses.map(e => ({
@@ -185,6 +195,15 @@ export async function submitReport(report: Report) {
     );
     if (eErr) throw eErr;
   }
+}
+
+/** Mark an existing report as submitted (only changes status + submitted_at) */
+export async function submitReport(reportId: string) {
+  const { error } = await supabase
+    .from("reports")
+    .update({ status: "submitted", submitted_at: new Date().toISOString() })
+    .eq("id", reportId);
+  if (error) throw error;
 }
 
 export async function deleteReport(id: string) {

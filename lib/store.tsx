@@ -52,7 +52,8 @@ type Action =
   | { type: "DELETE_CLIENT";  payload: string }
   | { type: "ADD_PROJECT";    payload: Project }
   | { type: "DELETE_PROJECT"; payload: Project }
-  | { type: "SUBMIT_REPORT";  payload: Report }
+  | { type: "SAVE_DRAFT";     payload: Report }   // upsert draft (create or update)
+  | { type: "SUBMIT_REPORT";  payload: string }   // reportId → change draft to submitted
   | { type: "DELETE_REPORT";  payload: string };
 
 function reducer(state: AppState, action: Action): AppState {
@@ -89,8 +90,22 @@ function reducer(state: AppState, action: Action): AppState {
           p => !(p.name === action.payload.name && p.clientName === action.payload.clientName)
         ),
       };
+    case "SAVE_DRAFT":
+      return {
+        ...state,
+        reports: state.reports.some(r => r.id === action.payload.id)
+          ? state.reports.map(r => r.id === action.payload.id ? action.payload : r)
+          : [...state.reports, action.payload],
+      };
     case "SUBMIT_REPORT":
-      return { ...state, reports: [...state.reports, action.payload] };
+      return {
+        ...state,
+        reports: state.reports.map(r =>
+          r.id === action.payload
+            ? { ...r, status: "submitted" as const, submittedAt: new Date().toISOString() }
+            : r
+        ),
+      };
     case "DELETE_REPORT":
       return { ...state, reports: state.reports.filter(r => r.id !== action.payload) };
     default:
@@ -193,6 +208,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         case "DELETE_CLIENT":  await db.deleteClient(action.payload);  break;
         case "ADD_PROJECT":    await db.addProject(action.payload);    break;
         case "DELETE_PROJECT": await db.deleteProject(action.payload); break;
+        case "SAVE_DRAFT":     await db.saveDraft(action.payload);     break;
         case "SUBMIT_REPORT":  await db.submitReport(action.payload);  break;
         case "DELETE_REPORT":  await db.deleteReport(action.payload);  break;
       }

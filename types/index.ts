@@ -36,7 +36,9 @@ export interface Report {
   id: string;
   userId: string;
   periodId: string;
+  status: "draft" | "submitted";
   submittedAt: string;
+  savedAt?: string | null;
   activities: Activity[];
   expenses: Expense[];
   totalDays: number;

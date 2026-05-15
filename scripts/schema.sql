@@ -34,7 +34,9 @@ create table if not exists public.reports (
   id              text primary key,
   user_id         text references public.users(id) on delete set null,
   period_id       text references public.periods(id) on delete set null,
+  status          text not null default 'submitted', -- 'draft' | 'submitted'
   submitted_at    timestamptz not null default now(),
+  saved_at        timestamptz,                       -- last draft save timestamp
   total_days      numeric not null default 0,
   total_expenses  numeric not null default 0,
   created_at      timestamptz default now()
@@ -125,3 +127,12 @@ insert into public.projects (name, client_name) values
   ('Proyecto Beta',  'Zota AI'),
   ('Proyecto Gamma', 'Cliente Externo 1')
 on conflict (name, client_name) do nothing;
+
+-- ── Migration: add draft columns (run this if the table already exists) ───────
+-- Safe to run multiple times; does nothing if columns already exist.
+
+alter table public.reports
+  add column if not exists status    text not null default 'submitted';
+
+alter table public.reports
+  add column if not exists saved_at  timestamptz;
