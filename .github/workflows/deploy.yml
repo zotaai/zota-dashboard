@@ -37,9 +37,9 @@ jobs:
         env:
           # Base path for GitHub Pages: https://<user>.github.io/<repo-name>
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
-          # Google Apps Script Web App URL — store this in repo Settings → Secrets → Actions
-          # Name the secret: SHEETS_API_URL
-          NEXT_PUBLIC_SHEETS_API_URL: ${{ secrets.SHEETS_API_URL }}
+          # Supabase — store these in repo Settings → Secrets and variables → Actions
+          NEXT_PUBLIC_SUPABASE_URL:      ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

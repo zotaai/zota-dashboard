@@ -5,14 +5,16 @@ import {
   useContext,
   useReducer,
   useEffect,
+  useRef,
   useCallback,
   useState,
   type ReactNode,
 } from "react";
 import type { AppState, User, BillingPeriod, Report } from "@/types";
-import * as api from "./sheets-api";
+import { supabase, isConfigured } from "./supabase";
+import * as db from "./supabase-api";
 
-// ── Initial / fallback state ──────────────────────────────────────────────────
+// ── Fallback state (used when Supabase is not configured) ─────────────────────
 
 const INITIAL_STATE: AppState = {
   users: [
@@ -70,7 +72,7 @@ interface StoreContextValue {
   dispatch: (action: Action) => void;
   loading: boolean;
   syncing: boolean;
-  offlineMode: boolean;
+  connected: boolean;
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -79,79 +81,105 @@ const StoreContext = createContext<StoreContextValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [state, localDispatch] = useReducer(reducer, INITIAL_STATE);
-  const [loading, setLoading]       = useState(true);
-  const [syncing, setSyncing]       = useState(false);
-  const [offlineMode, setOffline]   = useState(false);
+  const [loading,   setLoading]   = useState(true);
+  const [syncing,   setSyncing]   = useState(false);
+  const [connected, setConnected] = useState(false);
 
-  const sheetsEnabled = !!process.env.NEXT_PUBLIC_SHEETS_API_URL;
+  // ── Fetch and hydrate from Supabase ────────────────────────────────────────
+  const hydrate = useCallback(async () => {
+    if (!isConfigured) return;
+    try {
+      const data = await db.fetchAllData();
+      localDispatch({ type: "HYDRATE", payload: data });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      setConnected(true);
+    } catch (err) {
+      console.error("[Supabase] fetch error:", err);
+      setConnected(false);
+    }
+  }, []);
 
-  // ── Initial load ────────────────────────────────────────────────────────────
+  // ── Initial load ───────────────────────────────────────────────────────────
   useEffect(() => {
-    async function load() {
-      if (sheetsEnabled) {
-        try {
-          const remote = await api.fetchAllData();
-          localDispatch({ type: "HYDRATE", payload: remote });
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
-          setOffline(false);
-        } catch {
-          // Sheets unreachable — try localStorage cache
-          const cached = localStorage.getItem(STORAGE_KEY);
-          if (cached) {
-            localDispatch({ type: "HYDRATE", payload: JSON.parse(cached) });
-          }
-          setOffline(true);
-        }
-      } else {
-        // No Sheets URL configured — use localStorage only
-        const cached = localStorage.getItem(STORAGE_KEY);
-        if (cached) {
-          localDispatch({ type: "HYDRATE", payload: JSON.parse(cached) });
-        }
-        setOffline(true);
+    async function boot() {
+      // Immediately show cached data while Supabase loads
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if (cached) {
+        try { localDispatch({ type: "HYDRATE", payload: JSON.parse(cached) }); } catch {}
       }
+
+      await hydrate();
       setLoading(false);
     }
-    load();
-  }, [sheetsEnabled]);
+    boot();
+  }, [hydrate]);
 
-  // ── Persist to localStorage whenever state changes ───────────────────────────
+  // ── Real-time subscriptions ────────────────────────────────────────────────
+  // Re-hydrate whenever any table changes (another user made a write).
+  // We debounce slightly to batch rapid consecutive events.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
-    if (!loading) {
+    if (!isConfigured) return;
+
+    const debouncedHydrate = () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => hydrate(), 300);
+    };
+
+    const channel = supabase
+      .channel("zota-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "users" },      debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "periods" },     debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "areas" },       debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "reports" },     debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "activities" },  debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "expenses" },    debouncedHydrate)
+      .subscribe();
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      supabase.removeChannel(channel);
+    };
+  }, [hydrate]);
+
+  // ── Persist to localStorage when not connected to Supabase ────────────────
+  useEffect(() => {
+    if (!loading && !isConfigured) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
   }, [state, loading]);
 
-  // ── Dispatch: optimistic local update + background Sheets sync ───────────────
+  // ── Dispatch: optimistic update + background Supabase write ───────────────
   const dispatch = useCallback(async (action: Action) => {
-    localDispatch(action); // instant — no wait
+    localDispatch(action); // instant — UI never waits
 
-    if (!sheetsEnabled || offlineMode) return;
+    if (!isConfigured) return;
 
     setSyncing(true);
     try {
       switch (action.type) {
-        case "ADD_USER":      await api.addUser(action.payload);      break;
-        case "UPDATE_USER":   await api.updateUser(action.payload);   break;
-        case "DELETE_USER":   await api.deleteUser(action.payload);   break;
-        case "ADD_PERIOD":    await api.addPeriod(action.payload);    break;
-        case "UPDATE_PERIOD": await api.updatePeriod(action.payload); break;
-        case "DELETE_PERIOD": await api.deletePeriod(action.payload); break;
-        case "ADD_AREA":      await api.addArea(action.payload);      break;
-        case "DELETE_AREA":   await api.deleteArea(action.payload);   break;
-        case "SUBMIT_REPORT": await api.submitReport(action.payload); break;
-        case "DELETE_REPORT": await api.deleteReport(action.payload); break;
+        case "ADD_USER":      await db.addUser(action.payload);      break;
+        case "UPDATE_USER":   await db.updateUser(action.payload);   break;
+        case "DELETE_USER":   await db.deleteUser(action.payload);   break;
+        case "ADD_PERIOD":    await db.addPeriod(action.payload);    break;
+        case "UPDATE_PERIOD": await db.updatePeriod(action.payload); break;
+        case "DELETE_PERIOD": await db.deletePeriod(action.payload); break;
+        case "ADD_AREA":      await db.addArea(action.payload);      break;
+        case "DELETE_AREA":   await db.deleteArea(action.payload);   break;
+        case "SUBMIT_REPORT": await db.submitReport(action.payload); break;
+        case "DELETE_REPORT": await db.deleteReport(action.payload); break;
       }
     } catch (err) {
-      console.error("[Sheets sync error]", err);
-      // Don't revert — local state is the source of truth as fallback
+      console.error("[Supabase] write error:", err);
+      // Optimistic update stays — next real-time hydration will correct any inconsistency
     } finally {
       setSyncing(false);
     }
-  }, [sheetsEnabled, offlineMode]);
+  }, []);
 
   return (
-    <StoreContext.Provider value={{ state, dispatch, loading, syncing, offlineMode }}>
+    <StoreContext.Provider value={{ state, dispatch, loading, syncing, connected }}>
       {children}
     </StoreContext.Provider>
   );
