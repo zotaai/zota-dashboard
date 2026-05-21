@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Send, Download, FileSpreadsheet, Save, CheckCircle2 } from "lucide-react";
+import { Send, Download, FileSpreadsheet, Save, CheckCircle2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +21,65 @@ import { ExpenseTable } from "./ExpenseTable";
 import { DayCounter } from "./DayCounter";
 import type { Activity, Expense, Report } from "@/types";
 
+// ── Step indicator ─────────────────────────────────────────────────────────────
+
+const STEPS = [
+  { n: 1, label: "Usuario"  },
+  { n: 2, label: "Período"  },
+  { n: 3, label: "Registro" },
+  { n: 4, label: "Guardar"  },
+  { n: 5, label: "Enviar"   },
+];
+
+function StepIndicator({ current, done }: { current: number; done: boolean }) {
+  return (
+    <div className="mb-5 flex items-center justify-between">
+      {STEPS.map((step, i) => {
+        const completed = done || step.n < current;
+        const active    = !done && step.n === current;
+        const pending   = !done && step.n > current;
+
+        return (
+          <div key={step.n} className="flex flex-1 items-center">
+            {/* Circle */}
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-all ${
+                  completed
+                    ? "bg-[#0296DF] text-white"
+                    : active
+                    ? "border-2 border-[#0296DF] bg-transparent text-[#0296DF]"
+                    : "border border-white/20 bg-white/5 text-[#475569]"
+                }`}
+              >
+                {completed ? <Check className="h-3.5 w-3.5" /> : step.n}
+              </div>
+              <span
+                className={`text-[10px] font-medium uppercase tracking-wide ${
+                  completed ? "text-[#0296DF]" : active ? "text-white" : "text-[#475569]"
+                }`}
+              >
+                {step.label}
+              </span>
+            </div>
+
+            {/* Connector line (not after last step) */}
+            {i < STEPS.length - 1 && (
+              <div
+                className={`mx-1 mb-4 h-px flex-1 transition-all ${
+                  step.n < current || done ? "bg-[#0296DF]/60" : "bg-white/10"
+                }`}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
+
 export function ReportTab() {
   const { state, dispatch } = useStore();
 
@@ -34,7 +93,7 @@ export function ReportTab() {
   const [submitting,     setSubmitting]     = useState(false);
   const [successModal,   setSuccessModal]   = useState<"draft" | "submitted" | null>(null);
 
-  // ── Find existing report for this user + period ────────────────────────────
+  // ── Find existing report ───────────────────────────────────────────────────
   const existingReport = useMemo(
     () =>
       selectedUser && selectedPeriod
@@ -47,7 +106,7 @@ export function ReportTab() {
 
   const isSubmitted = existingReport?.status === "submitted";
 
-  // ── Load draft when user+period selection changes ──────────────────────────
+  // ── Load draft when selection changes ─────────────────────────────────────
   useEffect(() => {
     if (existingReport) {
       setActivities(existingReport.activities);
@@ -81,12 +140,31 @@ export function ReportTab() {
     [expenses]
   );
 
-  const canSave      = !!selectedUser && !!selectedPeriod;
-  const isSubmitValid =
-    totalRecordedDays === targetDays &&
-    targetDays > 0 &&
-    !!selectedUser &&
-    !!selectedPeriod;
+  // ── Step logic ─────────────────────────────────────────────────────────────
+  const step1 = !!selectedUser;
+  const step2 = step1 && !!selectedPeriod;
+  const hasRecords    = activities.length > 0 || expenses.length > 0;
+  const step3         = step2 && hasRecords;
+  const hoursComplete = totalRecordedDays >= targetDays && targetDays > 0;
+  const canSaveDraft  = step3 && !hoursComplete && !isSubmitted;
+  const canSubmit     = step3 && hoursComplete  && !isSubmitted;
+
+  // Current active step for the indicator
+  const currentStep = isSubmitted ? 5
+    : canSubmit     ? 5
+    : step3         ? 4
+    : step2         ? 3
+    : step1         ? 2
+    : 1;
+
+  // ── Hint message ───────────────────────────────────────────────────────────
+  const hint = isSubmitted ? null
+    : !step1        ? "Selecciona tu usuario para comenzar."
+    : !step2        ? "Ahora selecciona el período quincen al."
+    : !step3        ? "Añade al menos una dedicación o gasto para continuar."
+    : !hoursComplete
+      ? `Registra ${(targetDays - totalRecordedDays).toFixed(1)} día(s) más para poder enviar. Puedes guardar tu avance.`
+    : "¡Días completos! Ya puedes enviar tu reporte.";
 
   // ── Activity handlers ──────────────────────────────────────────────────────
   const addActivity = () =>
@@ -136,50 +214,43 @@ export function ReportTab() {
 
   // ── Save draft ─────────────────────────────────────────────────────────────
   const handleSaveDraft = async () => {
-    if (!canSave || saving) return;
+    if (!canSaveDraft || saving) return;
     setSaving(true);
-
     const id  = draftId ?? Date.now().toString();
-    const now = new Date().toISOString();
     setDraftId(id);
-    setLastSaved(now);
-
+    setLastSaved(new Date().toISOString());
     await dispatch({ type: "SAVE_DRAFT", payload: buildReport("draft", id) });
     setSaving(false);
     setSuccessModal("draft");
   };
 
-  // ── Submit final report ────────────────────────────────────────────────────
+  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!isSubmitValid || submitting) return;
+    if (!canSubmit || submitting) return;
     setSubmitting(true);
-
     const id = draftId ?? Date.now().toString();
     setDraftId(id);
-
-    // Save the final data first, then flip the status
     await dispatch({ type: "SAVE_DRAFT",    payload: buildReport("draft", id) });
     await dispatch({ type: "SUBMIT_REPORT", payload: id });
-
     setSubmitting(false);
     setSuccessModal("submitted");
   };
 
-  // ── Export helpers ─────────────────────────────────────────────────────────
+  // ── Export ─────────────────────────────────────────────────────────────────
   const getExportReport = (): Report => ({
-    id:            draftId ?? "draft",
-    userId:        selectedUser,
-    periodId:      selectedPeriod,
-    status:        existingReport?.status ?? "draft",
-    submittedAt:   existingReport?.submittedAt ?? new Date().toISOString(),
+    id:           draftId ?? "draft",
+    userId:       selectedUser,
+    periodId:     selectedPeriod,
+    status:       existingReport?.status ?? "draft",
+    submittedAt:  existingReport?.submittedAt ?? new Date().toISOString(),
     activities,
     expenses,
-    totalDays:     totalRecordedDays,
+    totalDays:    totalRecordedDays,
     totalExpenses,
   });
 
   const handleExportPDF = async () => {
-    if (!selectedUser || !selectedPeriod) return;
+    if (!step2) return;
     const user   = state.users.find((u) => u.id === selectedUser);
     const period = state.periods.find((p) => p.id === selectedPeriod);
     if (!user || !period) return;
@@ -187,14 +258,14 @@ export function ReportTab() {
   };
 
   const handleExportExcel = async () => {
-    if (!selectedUser || !selectedPeriod) return;
+    if (!step2) return;
     const user   = state.users.find((u) => u.id === selectedUser);
     const period = state.periods.find((p) => p.id === selectedPeriod);
     if (!user || !period) return;
     await exportReportToExcel(getExportReport(), user, period);
   };
 
-  const canExport = !!selectedUser && !!selectedPeriod && activities.length > 0;
+  const canExport = step3;
 
   // ── Last-saved label ───────────────────────────────────────────────────────
   const lastSavedText = useMemo(() => {
@@ -207,6 +278,11 @@ export function ReportTab() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="p-5">
+
+      {/* Step indicator */}
+      <StepIndicator current={currentStep} done={isSubmitted} />
+
+      {/* Filters */}
       <ReportFilters
         users={state.users}
         periods={state.periods}
@@ -214,11 +290,12 @@ export function ReportTab() {
         selectedPeriod={selectedPeriod}
         onUserChange={setSelectedUser}
         onPeriodChange={setSelectedPeriod}
+        periodDisabled={!step1}
       />
 
       {/* Submitted banner */}
       {isSubmitted && (
-        <div className="mt-4 flex items-center gap-2 rounded-lg border border-[#10B981]/30 bg-[#10B981]/10 px-4 py-3">
+        <div className="mt-2 flex items-center gap-2 rounded-lg border border-[#10B981]/30 bg-[#10B981]/10 px-4 py-3">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-[#10B981]" />
           <span className="text-sm text-[#10B981]">
             Reporte enviado el{" "}
@@ -232,21 +309,30 @@ export function ReportTab() {
 
       {/* Draft indicator */}
       {!isSubmitted && lastSavedText && (
-        <div className="mt-3 flex items-center gap-1.5 text-xs text-[#64748B]">
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-[#64748B]">
           <Save className="h-3 w-3" />
           <span>Borrador guardado: {lastSavedText}</span>
         </div>
       )}
 
-      {selectedPeriod && (
+      {/* Hint */}
+      {hint && (
+        <p className={`mt-3 text-xs ${hoursComplete && step3 ? "text-[#10B981]" : "text-[#64748B]"}`}>
+          {hint}
+        </p>
+      )}
+
+      {/* Day counter */}
+      {step2 && (
         <DayCounter
           targetDays={targetDays}
           recordedDays={totalRecordedDays}
-          isValid={isSubmitValid}
+          isValid={hoursComplete}
         />
       )}
 
-      <div className="mt-5">
+      {/* ── Tables — locked until period is selected ── */}
+      <div className={`mt-5 transition-opacity ${step2 ? "opacity-100" : "pointer-events-none opacity-30"}`}>
         <ActivityTable
           activities={activities}
           clients={state.clients}
@@ -255,7 +341,6 @@ export function ReportTab() {
           onUpdate={updateActivity}
           onDelete={deleteActivity}
         />
-
         <ExpenseTable
           expenses={expenses}
           onAdd={addExpense}
@@ -264,9 +349,10 @@ export function ReportTab() {
         />
       </div>
 
-      {/* ── Action area for draft/active reports ── */}
+      {/* ── Action area ── */}
       {!isSubmitted && (
         <div className="mt-4 space-y-3">
+          {/* Export buttons — only when there are records */}
           {canExport && (
             <div className="flex gap-2">
               <Button
@@ -290,38 +376,30 @@ export function ReportTab() {
             </div>
           )}
 
-          {/* Guardar avance */}
+          {/* Step 4 — Guardar Avance (only when hours incomplete) */}
           <Button
             variant="outline"
             onClick={handleSaveDraft}
-            disabled={!canSave || saving}
-            className="w-full border-white/10 bg-white/5 py-5 text-sm font-medium text-[#94A3B8] hover:border-[#0296DF]/40 hover:bg-white/10 hover:text-white disabled:opacity-40"
+            disabled={!canSaveDraft || saving}
+            className="w-full border-white/10 bg-white/5 py-5 text-sm font-medium text-[#94A3B8] hover:border-[#0296DF]/40 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Save className="mr-2 h-4 w-4" />
             {saving ? "GUARDANDO…" : "GUARDAR AVANCE"}
           </Button>
 
-          {/* Enviar reporte */}
+          {/* Step 5 — Enviar Reporte (only when hours complete) */}
           <Button
             onClick={handleSubmit}
-            disabled={!isSubmitValid || submitting}
-            className="w-full bg-[#0296DF] py-5 text-sm font-semibold tracking-wide text-white transition-all hover:bg-[#0284c7] hover:shadow-lg hover:shadow-[#0296DF]/20 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!canSubmit || submitting}
+            className="w-full bg-[#0296DF] py-5 text-sm font-semibold tracking-wide text-white transition-all hover:bg-[#0284c7] hover:shadow-lg hover:shadow-[#0296DF]/20 disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Send className="mr-2 h-4 w-4" />
             {submitting ? "ENVIANDO…" : "ENVIAR REPORTE QUINCENAL"}
           </Button>
-
-          {!isSubmitValid && selectedPeriod && (
-            <p className="text-center text-xs text-[#475569]">
-              {!selectedUser
-                ? "Seleccione un usuario para continuar."
-                : "El botón de envío se habilitará cuando los días registrados coincidan con los días laborables del período."}
-            </p>
-          )}
         </div>
       )}
 
-      {/* ── Action area for submitted reports (export only) ── */}
+      {/* Export only for submitted reports */}
       {isSubmitted && canExport && (
         <div className="mt-4 flex gap-2">
           <Button

@@ -16,6 +16,7 @@ interface ReportFiltersProps {
   selectedPeriod: string;
   onUserChange: (id: string) => void;
   onPeriodChange: (id: string) => void;
+  periodDisabled?: boolean;
 }
 
 export function ReportFilters({
@@ -25,15 +26,17 @@ export function ReportFilters({
   selectedPeriod,
   onUserChange,
   onPeriodChange,
+  periodDisabled = false,
 }: ReportFiltersProps) {
   return (
     <div className="mb-4 grid grid-cols-2 gap-4">
+      {/* Step 1 — Usuario */}
       <div>
         <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#64748B]">
           Usuario
         </label>
         <Select value={selectedUser} onValueChange={onUserChange}>
-          <SelectTrigger className="h-9 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
+          <SelectTrigger className="h-9 w-full border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
             <SelectValue placeholder="Seleccione usuario" />
           </SelectTrigger>
           <SelectContent className="border-white/10 bg-[#0F172A]">
@@ -49,12 +52,18 @@ export function ReportFilters({
           </SelectContent>
         </Select>
       </div>
-      <div>
+
+      {/* Step 2 — Período (locked until user selected) */}
+      <div className={periodDisabled ? "opacity-40" : ""}>
         <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-[#64748B]">
           Período
         </label>
-        <Select value={selectedPeriod} onValueChange={onPeriodChange}>
-          <SelectTrigger className="h-9 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
+        <Select
+          value={selectedPeriod}
+          onValueChange={onPeriodChange}
+          disabled={periodDisabled}
+        >
+          <SelectTrigger className="h-9 w-full border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:cursor-not-allowed">
             <SelectValue placeholder="Seleccione período" />
           </SelectTrigger>
           <SelectContent className="border-white/10 bg-[#0F172A]">
