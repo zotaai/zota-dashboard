@@ -1,13 +1,20 @@
 "use client";
 
-import { Clock } from "lucide-react";
+import Image from "next/image";
 
 export function DashboardHeader() {
   return (
     <header className="mx-auto mb-6 max-w-6xl">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#0296DF] to-[#023ABF] shadow-lg shadow-[#0296DF]/30">
-          <Clock className="h-5 w-5 text-white" />
+        <div className="h-10 w-10 overflow-hidden rounded-lg shadow-lg shadow-[#0296DF]/30">
+          <Image
+            src="/zota-dashboard/logo.png"
+            alt="Zota AI Consulting"
+            width={40}
+            height={40}
+            className="h-full w-full object-cover"
+            priority
+          />
         </div>
         <div>
           <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">
