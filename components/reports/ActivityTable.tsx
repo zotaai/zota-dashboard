@@ -68,7 +68,7 @@ export function ActivityTable({
 
       <div className="overflow-hidden rounded-lg border border-white/10">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_110px_minmax(0,1.2fr)_68px_36px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
+        <div className="grid grid-cols-[1fr_130px_190px_72px_36px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Descripción de la Actividad
           </span>
