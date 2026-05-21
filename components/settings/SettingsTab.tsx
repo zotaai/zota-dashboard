@@ -1,10 +1,85 @@
 "use client";
 
+import { useState } from "react";
+import { RefreshCw, CheckCircle2, AlertCircle } from "lucide-react";
 import { PeriodManager } from "./PeriodManager";
 import { UserManager } from "./UserManager";
 import { ClientManager } from "./ClientManager";
 import { ProjectManager } from "./ProjectManager";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+
+const SYNC_URL =
+  "https://xlefqqlabeidndqsrvca.supabase.co/functions/v1/sync-from-notion";
+
+type SyncState = "idle" | "loading" | "success" | "error";
+
+function NotionSyncSection() {
+  const [state, setState] = useState<SyncState>("idle");
+  const [detail, setDetail] = useState<string>("");
+
+  const handleSync = async () => {
+    setState("loading");
+    setDetail("");
+    try {
+      const res = await fetch(SYNC_URL, { method: "POST" });
+      const json = await res.json();
+      if (json.ok) {
+        setState("success");
+        setDetail(
+          `${json.clients} clientes · ${json.projects} proyectos sincronizados`
+        );
+      } else {
+        setState("error");
+        setDetail(json.error ?? "Error desconocido");
+      }
+    } catch (err) {
+      setState("error");
+      setDetail(err instanceof Error ? err.message : "Error de red");
+    }
+  };
+
+  return (
+    <div>
+      <div className="mb-3">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
+          Sincronización con Notion
+        </h3>
+        <p className="text-xs text-[#64748B]">
+          Importa clientes y proyectos desde la BD de Notion. También se
+          actualiza automáticamente cada hora.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Button
+          size="sm"
+          onClick={handleSync}
+          disabled={state === "loading"}
+          className="h-8 bg-[#0296DF] text-xs font-medium text-white hover:bg-[#0284c7] disabled:opacity-60"
+        >
+          <RefreshCw
+            className={`mr-1.5 h-3.5 w-3.5 ${state === "loading" ? "animate-spin" : ""}`}
+          />
+          {state === "loading" ? "Sincronizando…" : "Sincronizar con Notion"}
+        </Button>
+
+        {state === "success" && (
+          <span className="flex items-center gap-1.5 text-xs text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            {detail}
+          </span>
+        )}
+        {state === "error" && (
+          <span className="flex items-center gap-1.5 text-xs text-red-400">
+            <AlertCircle className="h-3.5 w-3.5" />
+            {detail}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function SettingsTab() {
   return (
@@ -12,6 +87,8 @@ export function SettingsTab() {
       <PeriodManager />
       <Separator className="bg-white/10" />
       <UserManager />
+      <Separator className="bg-white/10" />
+      <NotionSyncSection />
       <Separator className="bg-white/10" />
       <ClientManager />
       <Separator className="bg-white/10" />
