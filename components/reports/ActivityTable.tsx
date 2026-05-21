@@ -68,7 +68,7 @@ export function ActivityTable({
 
       <div className="overflow-hidden rounded-lg border border-white/10">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_160px_160px_80px_44px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
+        <div className="grid grid-cols-[1fr_110px_minmax(0,1.2fr)_68px_36px] gap-1.5 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Descripción de la Actividad
           </span>
@@ -96,7 +96,7 @@ export function ActivityTable({
               return (
                 <div
                   key={activity.id}
-                  className="grid grid-cols-[1fr_160px_160px_80px_44px] items-center gap-2 px-4 py-2 transition-colors hover:bg-white/[0.02]"
+                  className="grid grid-cols-[1fr_110px_minmax(0,1.2fr)_68px_36px] items-center gap-1.5 px-4 py-2 transition-colors hover:bg-white/[0.02]"
                 >
                   {/* Descripción */}
                   <Input
@@ -111,7 +111,7 @@ export function ActivityTable({
                     value={activity.client}
                     onValueChange={(v) => handleClientChange(activity.id, v)}
                   >
-                    <SelectTrigger className="h-8 border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF]">
+                    <SelectTrigger className="h-8 min-w-0 overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:truncate">
                       <SelectValue placeholder="Cliente" />
                     </SelectTrigger>
                     <SelectContent className="border-white/10 bg-[#0F172A]">
@@ -133,7 +133,7 @@ export function ActivityTable({
                     onValueChange={(v) => onUpdate(activity.id, "project", v)}
                     disabled={!activity.client || availableProjects.length === 0}
                   >
-                    <SelectTrigger className="h-8 border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:opacity-40">
+                    <SelectTrigger className="h-8 min-w-0 overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:opacity-40 [&>span]:truncate">
                       <SelectValue
                         placeholder={
                           !activity.client
