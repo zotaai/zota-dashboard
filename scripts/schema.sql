@@ -136,3 +136,38 @@ alter table public.reports
 
 alter table public.reports
   add column if not exists saved_at  timestamptz;
+
+-- ── Notion sync: pg_net trigger ───────────────────────────────────────────────
+-- Fires an HTTP POST to the Edge Function when a report is submitted.
+-- Requires pg_net (already enabled on Supabase by default).
+
+create extension if not exists pg_net schema extensions;
+
+create or replace function public.notify_notion_on_submit()
+returns trigger
+language plpgsql
+security definer
+as $$
+begin
+  if NEW.status = 'submitted' and (OLD.status is distinct from 'submitted') then
+    perform net.http_post(
+      url     := 'https://xlefqqlabeidndqsrvca.supabase.co/functions/v1/sync-to-notion',
+      body    := json_build_object(
+                   'type',       TG_OP,
+                   'table',      TG_TABLE_NAME,
+                   'schema',     TG_TABLE_SCHEMA,
+                   'record',     row_to_json(NEW),
+                   'old_record', row_to_json(OLD)
+                 )::jsonb,
+      headers := json_build_object('Content-Type', 'application/json')::jsonb
+    );
+  end if;
+  return NEW;
+end;
+$$;
+
+drop trigger if exists trg_notify_notion_on_submit on public.reports;
+create trigger trg_notify_notion_on_submit
+  after update on public.reports
+  for each row
+  execute function public.notify_notion_on_submit();
