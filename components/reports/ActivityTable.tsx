@@ -13,7 +13,7 @@ import {
 import type { Activity, Project } from "@/types";
 
 // Single source of truth for the column layout
-const COLS = "grid-cols-[1fr_140px_200px_72px_36px]";
+const COLS = "grid-cols-[1.5fr_1fr_1.5fr_72px_36px]";
 
 interface ActivityTableProps {
   activities: Activity[];
