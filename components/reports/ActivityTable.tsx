@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/select";
 import type { Activity, Project } from "@/types";
 
+// Single source of truth for the column layout
+const COLS = "grid-cols-[1fr_140px_200px_72px_36px]";
+
 interface ActivityTableProps {
   activities: Activity[];
   clients: string[];
@@ -29,13 +32,11 @@ export function ActivityTable({
   onUpdate,
   onDelete,
 }: ActivityTableProps) {
-  /** Projects available for a given client selection */
   const projectsForClient = (clientName: string) =>
     projects.filter((p) => p.clientName === clientName);
 
   const handleClientChange = (activityId: string, newClient: string) => {
     onUpdate(activityId, "client", newClient);
-    // If the current project doesn't belong to the new client, clear it
     const activity = activities.find((a) => a.id === activityId);
     if (activity) {
       const stillValid = projects.some(
@@ -67,8 +68,8 @@ export function ActivityTable({
       </div>
 
       <div className="overflow-hidden rounded-lg border border-white/10">
-        {/* Header */}
-        <div className="grid grid-cols-[1fr_130px_190px_72px_36px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
+        {/* ── Header ── same COLS as rows */}
+        <div className={`grid ${COLS} gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5`}>
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Descripción de la Actividad
           </span>
@@ -84,6 +85,7 @@ export function ActivityTable({
           <span />
         </div>
 
+        {/* ── Rows ── */}
         <div className="divide-y divide-white/5">
           {activities.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-[#475569]">
@@ -96,7 +98,7 @@ export function ActivityTable({
               return (
                 <div
                   key={activity.id}
-                  className="grid grid-cols-[1fr_110px_minmax(0,1.2fr)_68px_36px] items-center gap-1.5 px-4 py-2 transition-colors hover:bg-white/[0.02]"
+                  className={`grid ${COLS} items-center gap-2 px-4 py-2 transition-colors hover:bg-white/[0.02]`}
                 >
                   {/* Descripción */}
                   <Input
@@ -106,56 +108,60 @@ export function ActivityTable({
                     className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10"
                   />
 
-                  {/* Cliente */}
-                  <Select
-                    value={activity.client}
-                    onValueChange={(v) => handleClientChange(activity.id, v)}
-                  >
-                    <SelectTrigger className="h-8 min-w-0 overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:truncate">
-                      <SelectValue placeholder="Cliente" />
-                    </SelectTrigger>
-                    <SelectContent className="border-white/10 bg-[#0F172A]">
-                      {clients.map((c) => (
-                        <SelectItem
-                          key={c}
-                          value={c}
-                          className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
-                        >
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {/* Cliente — wrapped in min-w-0 so it can't overflow the cell */}
+                  <div className="min-w-0">
+                    <Select
+                      value={activity.client}
+                      onValueChange={(v) => handleClientChange(activity.id, v)}
+                    >
+                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:truncate [&>span]:block">
+                        <SelectValue placeholder="Cliente" />
+                      </SelectTrigger>
+                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                        {clients.map((c) => (
+                          <SelectItem
+                            key={c}
+                            value={c}
+                            className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
+                          >
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   {/* Proyecto — filtrado por cliente */}
-                  <Select
-                    value={activity.project}
-                    onValueChange={(v) => onUpdate(activity.id, "project", v)}
-                    disabled={!activity.client || availableProjects.length === 0}
-                  >
-                    <SelectTrigger className="h-8 min-w-0 overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:opacity-40 [&>span]:truncate">
-                      <SelectValue
-                        placeholder={
-                          !activity.client
-                            ? "Seleccione cliente"
-                            : availableProjects.length === 0
-                            ? "Sin proyectos"
-                            : "Proyecto"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent className="border-white/10 bg-[#0F172A]">
-                      {availableProjects.map((p) => (
-                        <SelectItem
-                          key={p.name}
-                          value={p.name}
-                          className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
-                        >
-                          {p.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="min-w-0">
+                    <Select
+                      value={activity.project}
+                      onValueChange={(v) => onUpdate(activity.id, "project", v)}
+                      disabled={!activity.client || availableProjects.length === 0}
+                    >
+                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:opacity-40 [&>span]:truncate [&>span]:block">
+                        <SelectValue
+                          placeholder={
+                            !activity.client
+                              ? "Seleccione cliente"
+                              : availableProjects.length === 0
+                              ? "Sin proyectos"
+                              : "Proyecto"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                        {availableProjects.map((p) => (
+                          <SelectItem
+                            key={p.name}
+                            value={p.name}
+                            className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
+                          >
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   {/* Días */}
                   <Input
