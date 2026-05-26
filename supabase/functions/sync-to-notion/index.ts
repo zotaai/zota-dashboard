@@ -124,7 +124,7 @@ async function upsertActivityPage(
 // ── Expenses ───────────────────────────────────────────────────────────────────
 
 function buildExpenseProperties(
-  expense:       { description: string; client: string; project: string; amount: number },
+  expense:       { description: string; category: string; client: string; project: string; amount: number },
   userName:      string,
   submittedAt:   string,
   projectPageId: string | null,
@@ -136,6 +136,11 @@ function buildExpenseProperties(
     "Proveedor": { select:    { name: userName } },
     "Fecha":     { date:      { start: submittedAt.split("T")[0] } },
   };
+
+  // Categoría — only set when a value was chosen (select field)
+  if (expense.category) {
+    props["Categoría"] = { select: { name: expense.category } };
+  }
 
   // "Proyecto asociado" is a relation field → only set it when we found the page
   if (projectPageId) {
@@ -201,7 +206,7 @@ Deno.serve(async (req) => {
       .eq("report_id", record.id),
     supabase
       .from("expenses")
-      .select("id, description, client, project, amount")
+      .select("id, description, category, client, project, amount")
       .eq("report_id", record.id),
     supabase.from("users").select("name").eq("id", record.user_id).single(),
     supabase.from("periods").select("name").eq("id", record.period_id).single(),

@@ -14,12 +14,13 @@ import {
 import type { Expense, Project } from "@/types";
 
 // Single source of truth for the column layout
-const COLS = "grid-cols-[1.5fr_1fr_1fr_68px_110px_36px]";
+const COLS = "grid-cols-[1.5fr_1fr_1fr_1fr_65px_95px_36px]";
 
 interface ExpenseTableProps {
   expenses: Expense[];
   clients: string[];
   projects: Project[];
+  expenseCategories: string[];
   onAdd: () => void;
   onUpdate: (id: string, field: keyof Expense, value: string | number | null) => void;
   onDelete: (id: string) => void;
@@ -29,6 +30,7 @@ export function ExpenseTable({
   expenses,
   clients,
   projects,
+  expenseCategories,
   onAdd,
   onUpdate,
   onDelete,
@@ -87,6 +89,9 @@ export function ExpenseTable({
             Descripción del Gasto
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+            Categoría
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Cliente
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
@@ -123,6 +128,29 @@ export function ExpenseTable({
                     onChange={(e) => onUpdate(expense.id, "description", e.target.value)}
                     className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10"
                   />
+
+                  {/* Categoría */}
+                  <div className="min-w-0">
+                    <Select
+                      value={expense.category}
+                      onValueChange={(v) => onUpdate(expense.id, "category", v)}
+                    >
+                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
+                        <SelectValue placeholder="Categoría" />
+                      </SelectTrigger>
+                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                        {expenseCategories.map((c) => (
+                          <SelectItem
+                            key={c}
+                            value={c}
+                            className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
+                          >
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   {/* Cliente */}
                   <div className="min-w-0">

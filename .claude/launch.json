@@ -5,7 +5,7 @@
       "name": "Zota Dashboard (Next.js dev)",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\npm.cmd",
       "runtimeArgs": ["run", "dev"],
-      "port": 3000
+      "port": 3001
     }
   ]
 }

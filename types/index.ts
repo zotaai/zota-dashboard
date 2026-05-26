@@ -27,6 +27,7 @@ export interface Activity {
 export interface Expense {
   id: string;
   description: string;
+  category: string;
   client: string;
   project: string;
   amount: number;
@@ -53,4 +54,5 @@ export interface AppState {
   reports: Report[];
   clients: string[];
   projects: Project[];
+  expenseCategories: string[];
 }

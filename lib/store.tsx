@@ -34,6 +34,7 @@ const INITIAL_STATE: AppState = {
     { name: "Proyecto Beta",  clientName: "Zota AI" },
     { name: "Proyecto Gamma", clientName: "Cliente Externo 1" },
   ],
+  expenseCategories: [],
 };
 
 const STORAGE_KEY = "zota-dashboard-v3";
@@ -176,7 +177,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .on("postgres_changes", { event: "*", schema: "public", table: "projects" },    debouncedHydrate)
       .on("postgres_changes", { event: "*", schema: "public", table: "reports" },     debouncedHydrate)
       .on("postgres_changes", { event: "*", schema: "public", table: "activities" },  debouncedHydrate)
-      .on("postgres_changes", { event: "*", schema: "public", table: "expenses" },    debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "expenses" },           debouncedHydrate)
+      .on("postgres_changes", { event: "*", schema: "public", table: "expense_categories" }, debouncedHydrate)
       .subscribe();
 
     return () => {

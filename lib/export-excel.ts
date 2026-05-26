@@ -74,11 +74,11 @@ export async function exportReportToExcel(
   if (report.expenses.length > 0) {
     const wsExp = wb.addWorksheet("Gastos");
     wsExp.columns = [
-      { header: "", key: "desc",    width: 40 },
-      { header: "", key: "client",  width: 22 },
-      { header: "", key: "project", width: 22 },
-      { header: "", key: "file",    width: 26 },
-      { header: "", key: "amount",  width: 16 },
+      { header: "", key: "desc",     width: 36 },
+      { header: "", key: "category", width: 18 },
+      { header: "", key: "client",   width: 22 },
+      { header: "", key: "project",  width: 22 },
+      { header: "", key: "amount",   width: 16 },
     ];
 
     const titleExp = wsExp.addRow([`Gastos — ${period.name}`, "", "", "", ""]);
@@ -88,15 +88,15 @@ export async function exportReportToExcel(
 
     const hdrExp = wsExp.addRow([
       "Descripción del Gasto",
+      "Categoría",
       "Cliente",
       "Proyecto",
-      "Factura",
       "Monto (USD)",
     ]);
     styleHeaderRow(hdrExp);
 
     report.expenses.forEach((e) => {
-      const row = wsExp.addRow([e.description, e.client || "—", e.project || "—", e.fileName ?? "—", e.amount]);
+      const row = wsExp.addRow([e.description, e.category || "—", e.client || "—", e.project || "—", e.amount]);
       row.getCell(5).numFmt = '"$"#,##0.00';
     });
 

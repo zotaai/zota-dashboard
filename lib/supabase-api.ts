@@ -27,6 +27,7 @@ function mapExpense(r: Record<string, unknown>): Expense {
   return {
     id:          r.id as string,
     description: r.description as string,
+    category:    (r.category as string) ?? "",
     client:      (r.client as string) ?? "",
     project:     (r.project as string) ?? "",
     amount:      Number(r.amount),
@@ -53,15 +54,16 @@ function mapReport(r: Record<string, unknown>): Report {
 // ── Read all data (single round-trip per table, parallel) ─────────────────────
 
 export async function fetchAllData(): Promise<AppState> {
-  const [usersRes, periodsRes, clientsRes, projectsRes, reportsRes] = await Promise.all([
+  const [usersRes, periodsRes, clientsRes, projectsRes, reportsRes, catRes] = await Promise.all([
     supabase.from("users").select("*").order("name"),
     supabase.from("periods").select("*").order("start_date"),
     supabase.from("clients").select("name").order("name"),
     supabase.from("projects").select("name, client_name").order("client_name").order("name"),
     supabase
       .from("reports")
-      .select("*, activities(id,description,client,project,days), expenses(id,description,client,project,amount,file_name,file_data)")
+      .select("*, activities(id,description,client,project,days), expenses(id,description,category,client,project,amount,file_name,file_data)")
       .order("submitted_at", { ascending: false }),
+    supabase.from("expense_categories").select("name").order("name"),
   ]);
 
   if (usersRes.error)    throw usersRes.error;
@@ -71,14 +73,15 @@ export async function fetchAllData(): Promise<AppState> {
   if (reportsRes.error)  throw reportsRes.error;
 
   return {
-    users:    (usersRes.data    ?? []) as User[],
-    periods:  (periodsRes.data  ?? []).map(mapPeriod),
-    clients:  (clientsRes.data  ?? []).map(r => r.name as string),
-    projects: (projectsRes.data ?? []).map(r => ({
+    users:             (usersRes.data    ?? []) as User[],
+    periods:           (periodsRes.data  ?? []).map(mapPeriod),
+    clients:           (clientsRes.data  ?? []).map(r => r.name as string),
+    projects:          (projectsRes.data ?? []).map(r => ({
       name:       r.name as string,
       clientName: r.client_name as string,
     })),
-    reports:  (reportsRes.data  ?? []).map(r => mapReport(r as Record<string, unknown>)),
+    reports:           (reportsRes.data  ?? []).map(r => mapReport(r as Record<string, unknown>)),
+    expenseCategories: (catRes.data ?? []).map(r => r.name as string),
   };
 }
 
@@ -192,7 +195,7 @@ export async function saveDraft(report: Report) {
     const { error: eErr } = await supabase.from("expenses").insert(
       report.expenses.map(e => ({
         id: e.id, report_id: report.id, description: e.description,
-        client: e.client, project: e.project,
+        category: e.category, client: e.client, project: e.project,
         amount: e.amount, file_name: e.fileName, file_data: e.fileData,
       }))
     );
