@@ -7,8 +7,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const NOTION_TOKEN       = Deno.env.get("NOTION_TOKEN")!;
-const NOTION_DB_ID       = Deno.env.get("NOTION_DATABASE_ID")!;       // Registros de Dedicaciones
-const NOTION_EXPENSES_DB = Deno.env.get("NOTION_EXPENSES_DB_ID")!;    // BD Gastos
+const NOTION_DB_ID       = Deno.env.get("NOTION_DATABASE_ID")!;    // Registros de Dedicaciones
+const NOTION_EXPENSES_DB = Deno.env.get("NOTION_EXPENSES_DB_ID")!; // BD Gastos
+const NOTION_PROJECTS_DB = "1157571d-e218-8367-b1a2-01b847034157"; // BD Proyectos (for relation lookup)
 const SUPABASE_URL       = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_KEY       = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -27,6 +28,40 @@ function notionHeaders() {
 
 function richText(content: string) {
   return [{ type: "text", text: { content: String(content ?? "") } }];
+}
+
+// ── BD Proyectos lookup (for relation field in BD Gastos) ──────────────────────
+
+// Cache to avoid repeated API calls for the same project within one sync
+const projectPageCache = new Map<string, string | null>();
+
+async function findProjectPageId(projectName: string): Promise<string | null> {
+  if (!projectName) return null;
+  if (projectPageCache.has(projectName)) return projectPageCache.get(projectName)!;
+
+  const res = await fetch(`${NOTION_API}/databases/${NOTION_PROJECTS_DB}/query`, {
+    method: "POST",
+    headers: notionHeaders(),
+    body: JSON.stringify({
+      filter: {
+        property: "Nombre del proyecto",
+        title: { equals: projectName },
+      },
+      page_size: 1,
+    }),
+  });
+
+  if (!res.ok) {
+    console.error("Project lookup error:", await res.text());
+    projectPageCache.set(projectName, null);
+    return null;
+  }
+
+  const data = await res.json();
+  const pageId = data.results?.[0]?.id ?? null;
+  projectPageCache.set(projectName, pageId);
+  console.log(`Project "${projectName}" → page ID: ${pageId ?? "not found"}`);
+  return pageId;
 }
 
 // ── Activities ─────────────────────────────────────────────────────────────────
@@ -89,18 +124,25 @@ async function upsertActivityPage(
 // ── Expenses ───────────────────────────────────────────────────────────────────
 
 function buildExpenseProperties(
-  expense:      { description: string; client: string; project: string; amount: number },
-  userName:     string,
-  submittedAt:  string,
-) {
-  return {
-    "Concepto":          { title:     richText(expense.description ?? "") },
-    "Cliente":           { rich_text: richText(expense.client  ?? "") },
-    "Proyecto asociado": { rich_text: richText(expense.project ?? "") },
-    "Monto":             { number:    Number(expense.amount) ?? 0 },
-    "Proveedor":         { rich_text: richText(userName) },
-    "Fecha":             { date:      { start: submittedAt.split("T")[0] } },
+  expense:       { description: string; client: string; project: string; amount: number },
+  userName:      string,
+  submittedAt:   string,
+  projectPageId: string | null,
+): Record<string, unknown> {
+  const props: Record<string, unknown> = {
+    "Concepto":  { title:     richText(expense.description ?? "") },
+    "Cliente":   { rich_text: richText(expense.client  ?? "") },
+    "Monto":     { number:    Number(expense.amount) ?? 0 },
+    "Proveedor": { select:    { name: userName } },
+    "Fecha":     { date:      { start: submittedAt.split("T")[0] } },
   };
+
+  // "Proyecto asociado" is a relation field → only set it when we found the page
+  if (projectPageId) {
+    props["Proyecto asociado"] = { relation: [{ id: projectPageId }] };
+  }
+
+  return props;
 }
 
 async function createExpensePage(properties: Record<string, unknown>): Promise<boolean> {
@@ -176,7 +218,7 @@ Deno.serve(async (req) => {
   const activities  = activitiesData ?? [];
   const expenses    = expensesData   ?? [];
 
-  // ── Sync activities to Registros de Dedicaciones ────────────────────────────
+  // ── Sync activities → Registros de Dedicaciones ─────────────────────────────
   const activityResults: { id: string; ok: boolean }[] = [];
 
   for (const activity of activities) {
@@ -187,12 +229,14 @@ Deno.serve(async (req) => {
     console.log(`Activity ${activity.id}: ${ok ? "synced" : "FAILED"}`);
   }
 
-  // ── Sync expenses to BD Gastos ──────────────────────────────────────────────
+  // ── Sync expenses → BD Gastos ───────────────────────────────────────────────
   const expenseResults: { id: string; ok: boolean }[] = [];
 
   for (const expense of expenses) {
-    const properties = buildExpenseProperties(expense, userName, submittedAt);
-    const ok         = await createExpensePage(properties);
+    // Resolve relation for "Proyecto asociado"
+    const projectPageId = await findProjectPageId(expense.project);
+    const properties    = buildExpenseProperties(expense, userName, submittedAt, projectPageId);
+    const ok            = await createExpensePage(properties);
     expenseResults.push({ id: expense.id, ok });
     console.log(`Expense ${expense.id}: ${ok ? "synced" : "FAILED"}`);
   }
@@ -202,11 +246,11 @@ Deno.serve(async (req) => {
   const failedExp = expenseResults.filter(r => !r.ok);
 
   const summary = {
-    reportId:          record.id,
-    activitiesSynced:  activityResults.length - failedAct.length,
-    expensesSynced:    expenseResults.length  - failedExp.length,
-    failedActivities:  failedAct,
-    failedExpenses:    failedExp,
+    reportId:         record.id,
+    activitiesSynced: activityResults.length - failedAct.length,
+    expensesSynced:   expenseResults.length  - failedExp.length,
+    failedActivities: failedAct,
+    failedExpenses:   failedExp,
   };
 
   console.log("Sync summary:", summary);
