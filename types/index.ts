@@ -27,6 +27,8 @@ export interface Activity {
 export interface Expense {
   id: string;
   description: string;
+  client: string;
+  project: string;
   amount: number;
   fileName: string | null;
   fileData: string | null;

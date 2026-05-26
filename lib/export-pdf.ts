@@ -131,14 +131,14 @@ export async function exportReportToPDF(
     autoTable(doc, {
       startY: y,
       margin: { left: margin, right: margin },
-      head: [["Descripción del Gasto", "Factura", "Monto (USD)"]],
-      body: report.expenses.map((e) => [e.description, e.fileName ?? "—", formatCurrency(e.amount)]),
-      foot: [[{ content: "TOTAL GASTOS", colSpan: 2, styles: { halign: "right" } }, formatCurrency(report.totalExpenses)]],
+      head: [["Descripción del Gasto", "Cliente", "Proyecto", "Factura", "Monto (USD)"]],
+      body: report.expenses.map((e) => [e.description, e.client || "—", e.project || "—", e.fileName ?? "—", formatCurrency(e.amount)]),
+      foot: [[{ content: "TOTAL GASTOS", colSpan: 4, styles: { halign: "right" } }, formatCurrency(report.totalExpenses)]],
       headStyles: { fillColor: BRAND.navy, textColor: BRAND.white, fontStyle: "bold", fontSize: 8 },
       bodyStyles: { fontSize: 8, textColor: BRAND.text },
       footStyles: { fillColor: BRAND.green, textColor: BRAND.white, fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: BRAND.lightGray },
-      columnStyles: { 2: { halign: "right", cellWidth: 35 } },
+      columnStyles: { 4: { halign: "right", cellWidth: 35 } },
     });
   }
 

@@ -185,7 +185,7 @@ export function ReportTab() {
   const addExpense = () =>
     setExpenses((prev) => [
       ...prev,
-      { id: Date.now().toString(), description: "", amount: 0, fileName: null, fileData: null },
+      { id: Date.now().toString(), description: "", client: "", project: "", amount: 0, fileName: null, fileData: null },
     ]);
 
   const updateExpense = (id: string, field: keyof Expense, value: string | number | null) =>
@@ -343,6 +343,8 @@ export function ReportTab() {
         />
         <ExpenseTable
           expenses={expenses}
+          clients={state.clients}
+          projects={state.projects}
           onAdd={addExpense}
           onUpdate={updateExpense}
           onDelete={deleteExpense}

@@ -27,6 +27,8 @@ function mapExpense(r: Record<string, unknown>): Expense {
   return {
     id:          r.id as string,
     description: r.description as string,
+    client:      (r.client as string) ?? "",
+    project:     (r.project as string) ?? "",
     amount:      Number(r.amount),
     fileName:    (r.file_name as string) ?? null,
     fileData:    (r.file_data as string) ?? null,
@@ -58,7 +60,7 @@ export async function fetchAllData(): Promise<AppState> {
     supabase.from("projects").select("name, client_name").order("client_name").order("name"),
     supabase
       .from("reports")
-      .select("*, activities(id,description,client,project,days), expenses(id,description,amount,file_name,file_data)")
+      .select("*, activities(id,description,client,project,days), expenses(id,description,client,project,amount,file_name,file_data)")
       .order("submitted_at", { ascending: false }),
   ]);
 
@@ -190,6 +192,7 @@ export async function saveDraft(report: Report) {
     const { error: eErr } = await supabase.from("expenses").insert(
       report.expenses.map(e => ({
         id: e.id, report_id: report.id, description: e.description,
+        client: e.client, project: e.project,
         amount: e.amount, file_name: e.fileName, file_data: e.fileData,
       }))
     );
