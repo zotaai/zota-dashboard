@@ -246,9 +246,9 @@ export function ExpenseTable({
                         variant="ghost"
                         size="sm"
                         onClick={() => fileRefs.current[expense.id]?.click()}
-                        className="h-8 w-full justify-start border border-transparent bg-white/5 text-xs text-[#64748B] hover:border-[#0296DF] hover:bg-white/10 hover:text-white"
+                        className="h-8 w-full justify-start whitespace-nowrap border border-transparent bg-white/5 text-xs text-[#64748B] hover:border-[#0296DF] hover:bg-white/10 hover:text-white"
                       >
-                        <Upload className="mr-1.5 h-3.5 w-3.5" />
+                        <Upload className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                         Subir archivo
                       </Button>
                     )}
