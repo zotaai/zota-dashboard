@@ -69,7 +69,7 @@ export function ExpenseTable({
           <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
             Registro de Gastos
           </h3>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-white/60">
             Registre los gastos asociados al período
           </p>
         </div>
@@ -86,25 +86,25 @@ export function ExpenseTable({
       <div className="overflow-hidden rounded-lg border border-white/10">
         {/* ── Header ── same COLS as rows */}
         <div className={`grid ${COLS} gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5`}>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Descripción del Gasto
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Categoría
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Cliente
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Proyecto
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Fecha
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Monto ($)
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Factura
           </span>
           <span />
@@ -113,7 +113,7 @@ export function ExpenseTable({
         {/* ── Rows ── */}
         <div className="divide-y divide-white/5">
           {expenses.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-[#475569]">
+            <div className="px-4 py-8 text-center text-sm text-white/50">
               No hay gastos registrados. Haga clic en{" "}
               <span className="text-[#0296DF]">Añadir</span> para comenzar.
             </div>
@@ -130,7 +130,7 @@ export function ExpenseTable({
                     placeholder="Descripción del gasto"
                     value={expense.description}
                     onChange={(e) => onUpdate(expense.id, "description", e.target.value)}
-                    className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10"
+                    className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-white/50 focus:border-[#0296DF] focus:bg-white/10"
                   />
 
                   {/* Categoría */}
@@ -142,7 +142,7 @@ export function ExpenseTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
                         <SelectValue placeholder="Categoría" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1976D2]">
+                      <SelectContent className="border-white/10 bg-[#023ABF]">
                         {expenseCategories.map((c) => (
                           <SelectItem
                             key={c}
@@ -165,7 +165,7 @@ export function ExpenseTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
                         <SelectValue placeholder="Cliente" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1976D2]">
+                      <SelectContent className="border-white/10 bg-[#023ABF]">
                         {clients.map((c) => (
                           <SelectItem
                             key={c}
@@ -197,7 +197,7 @@ export function ExpenseTable({
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1976D2]">
+                      <SelectContent className="border-white/10 bg-[#023ABF]">
                         {availableProjects.map((p) => (
                           <SelectItem
                             key={p.name}
@@ -258,7 +258,7 @@ export function ExpenseTable({
                         variant="ghost"
                         size="sm"
                         onClick={() => fileRefs.current[expense.id]?.click()}
-                        className="h-8 w-full justify-start whitespace-nowrap border border-transparent bg-white/5 text-xs text-[#64748B] hover:border-[#0296DF] hover:bg-white/10 hover:text-white"
+                        className="h-8 w-full justify-start whitespace-nowrap border border-transparent bg-white/5 text-xs text-white/60 hover:border-[#0296DF] hover:bg-white/10 hover:text-white"
                       >
                         <Upload className="mr-1.5 h-3.5 w-3.5 shrink-0" />
                         Subir archivo
@@ -272,7 +272,7 @@ export function ExpenseTable({
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(expense.id)}
-                      className="h-7 w-7 text-[#64748B] hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
+                      className="h-7 w-7 text-white/60 hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

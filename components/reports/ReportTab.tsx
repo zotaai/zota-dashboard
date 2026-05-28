@@ -49,14 +49,14 @@ function StepIndicator({ current, done }: { current: number; done: boolean }) {
                     ? "bg-[#0296DF] text-white"
                     : active
                     ? "border-2 border-[#0296DF] bg-transparent text-[#0296DF]"
-                    : "border border-white/20 bg-white/5 text-[#475569]"
+                    : "border border-white/20 bg-white/5 text-white/50"
                 }`}
               >
                 {completed ? <Check className="h-3.5 w-3.5" /> : step.n}
               </div>
               <span
                 className={`text-[10px] font-medium uppercase tracking-wide ${
-                  completed ? "text-[#0296DF]" : active ? "text-white" : "text-[#475569]"
+                  completed ? "text-[#0296DF]" : active ? "text-white" : "text-white/50"
                 }`}
               >
                 {step.label}
@@ -309,7 +309,7 @@ export function ReportTab() {
 
       {/* Draft indicator */}
       {!isSubmitted && lastSavedText && (
-        <div className="mt-2 flex items-center gap-1.5 text-xs text-[#64748B]">
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-white/60">
           <Save className="h-3 w-3" />
           <span>Borrador guardado: {lastSavedText}</span>
         </div>
@@ -317,7 +317,7 @@ export function ReportTab() {
 
       {/* Hint */}
       {hint && (
-        <p className={`mt-3 text-xs ${hoursComplete && step3 ? "text-[#10B981]" : "text-[#64748B]"}`}>
+        <p className={`mt-3 text-xs ${hoursComplete && step3 ? "text-[#10B981]" : "text-white/60"}`}>
           {hint}
         </p>
       )}
@@ -362,7 +362,7 @@ export function ReportTab() {
                 variant="ghost"
                 size="sm"
                 onClick={handleExportPDF}
-                className="h-8 border border-white/10 bg-white/5 text-xs text-[#94A3B8] hover:border-[#0296DF]/40 hover:text-white"
+                className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#0296DF]/40 hover:text-white"
               >
                 <Download className="mr-1.5 h-3.5 w-3.5" />
                 Exportar PDF
@@ -371,7 +371,7 @@ export function ReportTab() {
                 variant="ghost"
                 size="sm"
                 onClick={handleExportExcel}
-                className="h-8 border border-white/10 bg-white/5 text-xs text-[#94A3B8] hover:border-[#10B981]/40 hover:text-white"
+                className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#10B981]/40 hover:text-white"
               >
                 <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
                 Exportar Excel
@@ -384,7 +384,7 @@ export function ReportTab() {
             variant="outline"
             onClick={handleSaveDraft}
             disabled={!canSaveDraft || saving}
-            className="w-full border-white/10 bg-white/5 py-5 text-sm font-medium text-[#94A3B8] hover:border-[#0296DF]/40 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+            className="w-full border-white/10 bg-white/5 py-5 text-sm font-medium text-white/70 hover:border-[#0296DF]/40 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Save className="mr-2 h-4 w-4" />
             {saving ? "GUARDANDO…" : "GUARDAR AVANCE"}
@@ -409,7 +409,7 @@ export function ReportTab() {
             variant="ghost"
             size="sm"
             onClick={handleExportPDF}
-            className="h-8 border border-white/10 bg-white/5 text-xs text-[#94A3B8] hover:border-[#0296DF]/40 hover:text-white"
+            className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#0296DF]/40 hover:text-white"
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Exportar PDF
@@ -418,7 +418,7 @@ export function ReportTab() {
             variant="ghost"
             size="sm"
             onClick={handleExportExcel}
-            className="h-8 border border-white/10 bg-white/5 text-xs text-[#94A3B8] hover:border-[#10B981]/40 hover:text-white"
+            className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#10B981]/40 hover:text-white"
           >
             <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
             Exportar Excel
@@ -436,7 +436,7 @@ export function ReportTab() {
             <DialogTitle className="text-base font-semibold text-white">
               Avance guardado
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-[#94A3B8]">
+            <DialogDescription className="text-center text-sm text-white/70">
               Tu progreso fue guardado correctamente. Puedes continuar registrando
               actividades y volver a guardar cuando quieras.
             </DialogDescription>
@@ -461,7 +461,7 @@ export function ReportTab() {
             <DialogTitle className="text-base font-semibold text-white">
               Reporte enviado
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-[#94A3B8]">
+            <DialogDescription className="text-center text-sm text-white/70">
               Se registró el reporte quincenal correctamente. Ya no podrás
               realizar cambios en este período.
             </DialogDescription>

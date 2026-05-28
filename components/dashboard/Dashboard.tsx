@@ -11,13 +11,13 @@ import { useStore } from "@/lib/store";
 import { isConfigured } from "@/lib/supabase";
 
 const TAB_CLASS =
-  "flex flex-1 items-center justify-center gap-2 rounded-none py-3 text-sm font-medium tracking-wide text-[#94A3B8] transition-colors data-[state=active]:bg-[#0296DF]/10 data-[state=active]:text-[#0296DF]";
+  "flex flex-1 items-center justify-center gap-2 rounded-none py-3 text-sm font-medium tracking-wide text-white/70 transition-colors data-[state=active]:bg-[#0296DF]/10 data-[state=active]:text-[#0296DF]";
 
 function LoadingScreen() {
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-[#0296DF]" />
-      <p className="text-sm text-[#64748B]">Iniciando aplicación…</p>
+      <p className="text-sm text-white/60">Iniciando aplicación…</p>
     </div>
   );
 }
@@ -64,14 +64,14 @@ export function Dashboard() {
   const { loading } = useStore();
 
   return (
-    <div className="min-h-screen bg-[#1565C0] px-4 py-6 md:px-8 md:py-8">
+    <div className="min-h-screen px-4 py-6 md:px-8 md:py-8">
       <DashboardHeader />
 
       <div className="mx-auto mb-3 max-w-6xl">
         <StatusBar />
       </div>
 
-      <div className="mx-auto max-w-6xl rounded-xl border border-white/[0.12] bg-[#ffffff0d] shadow-2xl backdrop-blur-md">
+      <div className="mx-auto max-w-6xl rounded-xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-md">
         {loading ? (
           <LoadingScreen />
         ) : (
@@ -104,7 +104,7 @@ export function Dashboard() {
       </div>
 
       <footer className="mx-auto mt-6 max-w-6xl text-center">
-        <p className="text-xs tracking-wide text-[#475569]">
+        <p className="text-xs tracking-wide text-white/50">
           © 2026 Zota AI Consulting. Elite AI B2B Solutions.
         </p>
       </footer>

@@ -53,7 +53,7 @@ export function ActivityTable({
           <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
             Registro de Dedicaciones
           </h3>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-white/60">
             Registre las actividades realizadas durante el período
           </p>
         </div>
@@ -70,16 +70,16 @@ export function ActivityTable({
       <div className="overflow-hidden rounded-lg border border-white/10">
         {/* ── Header ── same COLS as rows */}
         <div className={`grid ${COLS} gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5`}>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Descripción de la Actividad
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Cliente
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Proyecto
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
             Días
           </span>
           <span />
@@ -88,7 +88,7 @@ export function ActivityTable({
         {/* ── Rows ── */}
         <div className="divide-y divide-white/5">
           {activities.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-[#475569]">
+            <div className="px-4 py-8 text-center text-sm text-white/50">
               No hay actividades registradas. Haga clic en{" "}
               <span className="text-[#0296DF]">Añadir</span> para comenzar.
             </div>
@@ -105,7 +105,7 @@ export function ActivityTable({
                     placeholder="Descripción de la actividad"
                     value={activity.description}
                     onChange={(e) => onUpdate(activity.id, "description", e.target.value)}
-                    className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10"
+                    className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-white/50 focus:border-[#0296DF] focus:bg-white/10"
                   />
 
                   {/* Cliente — wrapped in min-w-0 so it can't overflow the cell */}
@@ -117,7 +117,7 @@ export function ActivityTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:truncate [&>span]:block">
                         <SelectValue placeholder="Cliente" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1976D2]">
+                      <SelectContent className="border-white/10 bg-[#023ABF]">
                         {clients.map((c) => (
                           <SelectItem
                             key={c}
@@ -149,7 +149,7 @@ export function ActivityTable({
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1976D2]">
+                      <SelectContent className="border-white/10 bg-[#023ABF]">
                         {availableProjects.map((p) => (
                           <SelectItem
                             key={p.name}
@@ -182,7 +182,7 @@ export function ActivityTable({
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(activity.id)}
-                      className="h-7 w-7 text-[#64748B] hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
+                      className="h-7 w-7 text-white/60 hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

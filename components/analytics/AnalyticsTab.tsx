@@ -25,7 +25,7 @@ function ChartCard({
         <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
           {title}
         </h3>
-        <p className="text-xs text-[#64748B]">{subtitle}</p>
+        <p className="text-xs text-white/60">{subtitle}</p>
       </div>
       {children}
     </div>
@@ -51,7 +51,7 @@ export function AnalyticsTab() {
           <h2 className="text-base font-semibold tracking-wide text-white">
             ANALYTICS
           </h2>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-white/60">
             Resumen consolidado de todos los reportes enviados
           </p>
         </div>
@@ -60,7 +60,7 @@ export function AnalyticsTab() {
             variant="ghost"
             size="sm"
             onClick={handleExportAll}
-            className="h-8 border border-white/10 bg-white/5 text-xs text-[#94A3B8] hover:border-[#10B981]/40 hover:text-white"
+            className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#10B981]/40 hover:text-white"
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Exportar todo (.xlsx)

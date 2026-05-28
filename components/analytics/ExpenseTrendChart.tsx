@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-[280px] items-center justify-center text-center text-sm text-[#475569]">
+      <div className="flex h-[280px] items-center justify-center text-center text-sm text-white/50">
         Sin gastos registrados. Añade gastos en tus reportes para ver la tendencia.
       </div>
     );

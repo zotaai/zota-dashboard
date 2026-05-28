@@ -28,24 +28,24 @@ export function ClientManager() {
         <h2 className="text-base font-semibold tracking-wide text-white">
           GESTIÓN DE CLIENTES
         </h2>
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-white/60">
           Clientes disponibles para clasificar actividades
         </p>
       </div>
 
       <div className="mb-5 rounded-lg border border-white/10 bg-[#ffffff05] p-4">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#64748B]">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-white/60">
           Agregar Cliente
         </p>
         <div className="flex gap-3">
           <div className="relative flex-1">
-            <Building2 className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#475569]" />
+            <Building2 className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/50" />
             <Input
               placeholder="Nombre del cliente"
               value={newClient}
               onChange={(e) => setNewClient(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-              className="h-9 border-white/10 bg-white/5 pl-9 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10"
+              className="h-9 border-white/10 bg-white/5 pl-9 text-sm text-white placeholder:text-white/50 focus:border-[#0296DF] focus:bg-white/10"
             />
           </div>
           <Button
@@ -64,11 +64,11 @@ export function ClientManager() {
             key={client}
             className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 py-1 pl-3 pr-1.5"
           >
-            <span className="text-sm text-[#94A3B8]">{client}</span>
+            <span className="text-sm text-white/70">{client}</span>
             <button
               onClick={() => handleDelete(client)}
               disabled={state.clients.length <= 1}
-              className="flex h-5 w-5 items-center justify-center rounded-full text-[#475569] transition-colors hover:bg-[#EF4444]/20 hover:text-[#EF4444] disabled:opacity-30"
+              className="flex h-5 w-5 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-[#EF4444]/20 hover:text-[#EF4444] disabled:opacity-30"
             >
               <Trash2 className="h-3 w-3" />
             </button>

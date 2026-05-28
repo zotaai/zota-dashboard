@@ -176,7 +176,7 @@ export function HistoryTab() {
         <h2 className="mb-0.5 text-base font-semibold tracking-wide text-white">
           REPORTES ENVIADOS
         </h2>
-        <p className="mb-4 text-xs text-[#64748B]">
+        <p className="mb-4 text-xs text-white/60">
           Consulta los registros de dedicaciones y gastos de todos los reportes quincenales publicados.
         </p>
 
@@ -232,8 +232,8 @@ export function HistoryTab() {
       {/* Empty state */}
       {submitted.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-white/10 py-16 text-center">
-          <FileX className="h-8 w-8 text-[#475569]" />
-          <p className="text-sm text-[#475569]">Aún no hay reportes enviados.</p>
+          <FileX className="h-8 w-8 text-white/50" />
+          <p className="text-sm text-white/50">Aún no hay reportes enviados.</p>
         </div>
       ) : (
         <>
@@ -242,7 +242,7 @@ export function HistoryTab() {
             <div className="mb-3 flex items-center gap-2">
               <ClipboardList className="h-4 w-4 text-[#0296DF]" />
               <h3 className="text-sm font-semibold text-white">Registros de Dedicaciones</h3>
-              <span className="ml-auto text-xs text-[#64748B]">
+              <span className="ml-auto text-xs text-white/60">
                 {totalDays} {totalDays === 1 ? "día" : "días"} en total
               </span>
             </div>
@@ -251,7 +251,7 @@ export function HistoryTab() {
               {/* Table header */}
               <div className="grid grid-cols-[150px_170px_1fr_120px_130px_64px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
                 {["Usuario","Período","Descripción","Cliente","Proyecto","Días"].map(h => (
-                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-white/60">
                     {h}
                   </span>
                 ))}
@@ -260,7 +260,7 @@ export function HistoryTab() {
               {/* Rows */}
               <div className="max-h-96 divide-y divide-white/5 overflow-y-auto">
                 {activityRows.length === 0 ? (
-                  <div className="px-4 py-10 text-center text-sm text-[#475569]">
+                  <div className="px-4 py-10 text-center text-sm text-white/50">
                     Sin registros para el filtro seleccionado.
                   </div>
                 ) : (
@@ -270,10 +270,10 @@ export function HistoryTab() {
                       className="grid grid-cols-[150px_170px_1fr_120px_130px_64px] items-center gap-2 px-4 py-2.5 transition-colors hover:bg-white/[0.02]"
                     >
                       <span className="truncate text-xs text-[#CBD5E1]">{a.userName}</span>
-                      <span className="truncate text-xs text-[#64748B]">{a.periodName}</span>
-                      <span className="truncate text-xs text-[#94A3B8]">{a.description || "—"}</span>
-                      <span className="truncate text-xs text-[#64748B]">{a.client || "—"}</span>
-                      <span className="truncate text-xs text-[#64748B]">{a.project || "—"}</span>
+                      <span className="truncate text-xs text-white/60">{a.periodName}</span>
+                      <span className="truncate text-xs text-white/70">{a.description || "—"}</span>
+                      <span className="truncate text-xs text-white/60">{a.client || "—"}</span>
+                      <span className="truncate text-xs text-white/60">{a.project || "—"}</span>
                       <span className="text-xs font-semibold text-[#0296DF]">{a.days}</span>
                     </div>
                   ))
@@ -283,7 +283,7 @@ export function HistoryTab() {
               {/* Footer total */}
               {activityRows.length > 0 && (
                 <div className="flex justify-end border-t border-white/10 bg-[#ffffff05] px-4 py-2">
-                  <span className="text-xs text-[#64748B]">
+                  <span className="text-xs text-white/60">
                     Total: <span className="font-semibold text-[#0296DF]">{totalDays} días</span>
                   </span>
                 </div>
@@ -296,7 +296,7 @@ export function HistoryTab() {
             <div className="mb-3 flex items-center gap-2">
               <Receipt className="h-4 w-4 text-[#10B981]" />
               <h3 className="text-sm font-semibold text-white">Registros de Gastos</h3>
-              <span className="ml-auto text-xs text-[#64748B]">
+              <span className="ml-auto text-xs text-white/60">
                 ${totalExpenses.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total
               </span>
             </div>
@@ -305,7 +305,7 @@ export function HistoryTab() {
               {/* Table header */}
               <div className="grid grid-cols-[150px_170px_1fr_130px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
                 {["Usuario","Período","Descripción","Monto"].map(h => (
-                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-white/60">
                     {h}
                   </span>
                 ))}
@@ -314,7 +314,7 @@ export function HistoryTab() {
               {/* Rows */}
               <div className="max-h-64 divide-y divide-white/5 overflow-y-auto">
                 {expenseRows.length === 0 ? (
-                  <div className="px-4 py-10 text-center text-sm text-[#475569]">
+                  <div className="px-4 py-10 text-center text-sm text-white/50">
                     Sin gastos para el filtro seleccionado.
                   </div>
                 ) : (
@@ -324,8 +324,8 @@ export function HistoryTab() {
                       className="grid grid-cols-[150px_170px_1fr_130px] items-center gap-2 px-4 py-2.5 transition-colors hover:bg-white/[0.02]"
                     >
                       <span className="truncate text-xs text-[#CBD5E1]">{e.userName}</span>
-                      <span className="truncate text-xs text-[#64748B]">{e.periodName}</span>
-                      <span className="truncate text-xs text-[#94A3B8]">{e.description || "—"}</span>
+                      <span className="truncate text-xs text-white/60">{e.periodName}</span>
+                      <span className="truncate text-xs text-white/70">{e.description || "—"}</span>
                       <span className="text-xs font-semibold text-[#10B981]">
                         ${e.amount.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
@@ -337,7 +337,7 @@ export function HistoryTab() {
               {/* Footer total */}
               {expenseRows.length > 0 && (
                 <div className="flex justify-end border-t border-white/10 bg-[#ffffff05] px-4 py-2">
-                  <span className="text-xs text-[#64748B]">
+                  <span className="text-xs text-white/60">
                     Total:{" "}
                     <span className="font-semibold text-[#10B981]">
                       ${totalExpenses.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

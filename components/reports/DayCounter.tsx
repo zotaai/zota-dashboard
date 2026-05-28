@@ -23,7 +23,7 @@ export function DayCounter({
       {showPeriodBadge && targetDays > 0 && (
         <div className="flex items-center gap-2 rounded-lg border border-[#0296DF]/20 bg-[#0296DF]/5 px-4 py-2.5">
           <Clock className="h-4 w-4 text-[#0296DF]" />
-          <span className="text-sm text-[#94A3B8]">
+          <span className="text-sm text-white/70">
             Días laborables objetivo:
           </span>
           <span className="rounded bg-[#0296DF]/20 px-2 py-0.5 text-sm font-semibold text-[#0296DF]">
@@ -33,7 +33,7 @@ export function DayCounter({
       )}
 
       <div className="flex items-center justify-end gap-3">
-        <span className="text-sm text-[#94A3B8]">Días registrados:</span>
+        <span className="text-sm text-white/70">Días registrados:</span>
         <span
           className={`rounded px-2 py-0.5 text-sm font-semibold ${
             isValid

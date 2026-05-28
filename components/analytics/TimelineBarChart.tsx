@@ -25,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         Días registrados:{" "}
         <span className="font-bold">{payload[0]?.value}</span>
       </p>
-      <p className="text-[#94A3B8]">
+      <p className="text-white/70">
         Reportes:{" "}
         <span className="font-bold">{payload[0]?.payload?.reports}</span>
       </p>
@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export function TimelineBarChart({ data }: TimelineBarChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-[280px] items-center justify-center text-center text-sm text-[#475569]">
+      <div className="flex h-[280px] items-center justify-center text-center text-sm text-white/50">
         Sin reportes enviados. Envía reportes para ver la evolución por período.
       </div>
     );

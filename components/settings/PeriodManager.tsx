@@ -150,7 +150,7 @@ export function PeriodManager() {
         <h2 className="text-base font-semibold tracking-wide text-white">
           GESTIÓN DE PERÍODOS
         </h2>
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-white/60">
           Selecciona el año y el mes — las dos quincenas se generan automáticamente.
           Ajusta los días laborables si hay feriados y luego guarda.
         </p>
@@ -158,7 +158,7 @@ export function PeriodManager() {
 
       {/* ── Generator ── */}
       <div className="mb-5 rounded-lg border border-white/10 bg-[#ffffff05] p-4">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#64748B]">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-white/60">
           Agregar Período
         </p>
 
@@ -193,9 +193,9 @@ export function PeriodManager() {
             <div className="mb-3 overflow-hidden rounded-lg border border-white/10">
               {/* Preview header */}
               <div className="grid grid-cols-[1fr_110px_110px_90px] gap-2 border-b border-white/10 bg-[#ffffff08] px-4 py-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">Período</span>
-                <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">Inicio</span>
-                <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">Fin</span>
+                <span className="text-xs font-medium uppercase tracking-wider text-white/60">Período</span>
+                <span className="text-xs font-medium uppercase tracking-wider text-white/60">Inicio</span>
+                <span className="text-xs font-medium uppercase tracking-wider text-white/60">Fin</span>
                 <div className="flex items-center gap-1">
                   <Pencil className="h-3 w-3 text-[#0296DF]" />
                   <span className="text-xs font-medium uppercase tracking-wider text-[#0296DF]">Días Lab.</span>
@@ -217,12 +217,12 @@ export function PeriodManager() {
                           <span className="rounded text-xs text-[#F59E0B]">ya existe</span>
                         )}
                       </div>
-                      <span className="text-sm text-[#94A3B8]">
+                      <span className="text-sm text-white/70">
                         {new Date(q.startDate + "T00:00:00").toLocaleDateString("es-MX", {
                           day: "2-digit", month: "short",
                         })}
                       </span>
-                      <span className="text-sm text-[#94A3B8]">
+                      <span className="text-sm text-white/70">
                         {new Date(q.endDate + "T00:00:00").toLocaleDateString("es-MX", {
                           day: "2-digit", month: "short",
                         })}
@@ -259,16 +259,16 @@ export function PeriodManager() {
         {/* Header */}
         <div className="grid grid-cols-[1fr_130px_130px_130px_44px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
           <div className="flex items-center gap-1.5">
-            <Lock className="h-3 w-3 text-[#475569]" />
-            <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">Nombre</span>
+            <Lock className="h-3 w-3 text-white/50" />
+            <span className="text-xs font-medium uppercase tracking-wider text-white/60">Nombre</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Lock className="h-3 w-3 text-[#475569]" />
-            <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">Inicio</span>
+            <Lock className="h-3 w-3 text-white/50" />
+            <span className="text-xs font-medium uppercase tracking-wider text-white/60">Inicio</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Lock className="h-3 w-3 text-[#475569]" />
-            <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">Fin</span>
+            <Lock className="h-3 w-3 text-white/50" />
+            <span className="text-xs font-medium uppercase tracking-wider text-white/60">Fin</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Pencil className="h-3 w-3 text-[#0296DF]" />
@@ -280,7 +280,7 @@ export function PeriodManager() {
         {/* Rows */}
         <div className="divide-y divide-white/5">
           {state.periods.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-[#475569]">
+            <div className="px-4 py-8 text-center text-sm text-white/50">
               No hay períodos registrados.
             </div>
           ) : (
@@ -290,13 +290,13 @@ export function PeriodManager() {
                 className="grid grid-cols-[1fr_130px_130px_130px_44px] items-center gap-2 px-4 py-2 transition-colors hover:bg-white/[0.02]"
               >
                 <div className="flex h-8 items-center rounded bg-white/[0.03] px-3">
-                  <span className="truncate text-sm text-[#94A3B8]">{period.name}</span>
+                  <span className="truncate text-sm text-white/70">{period.name}</span>
                 </div>
                 <div className="flex h-8 items-center rounded bg-white/[0.03] px-3">
-                  <span className="text-sm text-[#94A3B8]">{fmtDate(period.startDate)}</span>
+                  <span className="text-sm text-white/70">{fmtDate(period.startDate)}</span>
                 </div>
                 <div className="flex h-8 items-center rounded bg-white/[0.03] px-3">
-                  <span className="text-sm text-[#94A3B8]">{fmtDate(period.endDate)}</span>
+                  <span className="text-sm text-white/70">{fmtDate(period.endDate)}</span>
                 </div>
                 <div className="flex justify-center">
                   <Input
@@ -313,7 +313,7 @@ export function PeriodManager() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(period.id)}
-                    className="h-7 w-7 text-[#64748B] hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
+                    className="h-7 w-7 text-white/60 hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>

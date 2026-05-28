@@ -45,7 +45,7 @@ function NotionSyncSection() {
         <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
           Sincronización con Notion
         </h3>
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-white/60">
           Importa clientes y proyectos desde la BD de Notion. También se
           actualiza automáticamente cada hora.
         </p>

@@ -45,14 +45,14 @@ export function ProjectManager() {
         <h2 className="text-base font-semibold tracking-wide text-white">
           GESTIÓN DE PROYECTOS
         </h2>
-        <p className="text-xs text-[#64748B]">
+        <p className="text-xs text-white/60">
           Proyectos asociados a cada cliente
         </p>
       </div>
 
       {/* Add form */}
       <div className="mb-5 rounded-lg border border-white/10 bg-[#ffffff05] p-4">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-[#64748B]">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-white/60">
           Agregar Proyecto
         </p>
         <div className="flex gap-3">
@@ -61,7 +61,7 @@ export function ProjectManager() {
             <SelectTrigger className="h-9 w-44 shrink-0 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
               <SelectValue placeholder="Cliente" />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#1976D2]">
+            <SelectContent className="border-white/10 bg-[#023ABF]">
               {state.clients.map((c) => (
                 <SelectItem
                   key={c}
@@ -76,14 +76,14 @@ export function ProjectManager() {
 
           {/* Project name */}
           <div className="relative flex-1">
-            <FolderKanban className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#475569]" />
+            <FolderKanban className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/50" />
             <Input
               placeholder="Nombre del proyecto"
               value={newProject}
               onChange={(e) => setNewProject(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               disabled={!selectedClient}
-              className="h-9 border-white/10 bg-white/5 pl-9 text-sm text-white placeholder:text-[#475569] focus:border-[#0296DF] focus:bg-white/10 disabled:opacity-40"
+              className="h-9 border-white/10 bg-white/5 pl-9 text-sm text-white placeholder:text-white/50 focus:border-[#0296DF] focus:bg-white/10 disabled:opacity-40"
             />
           </div>
 
@@ -108,13 +108,13 @@ export function ProjectManager() {
                 {client}
               </span>
               <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-[#475569]">
+              <span className="text-xs text-white/50">
                 {projects.length} {projects.length === 1 ? "proyecto" : "proyectos"}
               </span>
             </div>
 
             {projects.length === 0 ? (
-              <p className="pl-1 text-xs text-[#475569] italic">
+              <p className="pl-1 text-xs text-white/50 italic">
                 Sin proyectos asignados.
               </p>
             ) : (
@@ -124,11 +124,11 @@ export function ProjectManager() {
                     key={`${p.clientName}-${p.name}`}
                     className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 py-1 pl-3 pr-1.5"
                   >
-                    <FolderKanban className="h-3 w-3 text-[#64748B]" />
-                    <span className="text-sm text-[#94A3B8]">{p.name}</span>
+                    <FolderKanban className="h-3 w-3 text-white/60" />
+                    <span className="text-sm text-white/70">{p.name}</span>
                     <button
                       onClick={() => handleDelete(p.name, p.clientName)}
-                      className="flex h-5 w-5 items-center justify-center rounded-full text-[#475569] transition-colors hover:bg-[#EF4444]/20 hover:text-[#EF4444]"
+                      className="flex h-5 w-5 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-[#EF4444]/20 hover:text-[#EF4444]"
                     >
                       <Trash2 className="h-3 w-3" />
                     </button>

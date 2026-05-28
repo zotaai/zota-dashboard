@@ -20,7 +20,7 @@ export function DashboardHeader() {
           <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">
             Zota AI Consulting
           </h1>
-          <p className="text-xs tracking-widest text-[#64748B]">
+          <p className="text-xs tracking-widest text-white/60">
             TIME &amp; EXPENSE TRACKING
           </p>
         </div>

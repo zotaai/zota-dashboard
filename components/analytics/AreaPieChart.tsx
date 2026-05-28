@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   return (
     <div className="rounded-lg border border-white/10 bg-[#1976D2] px-3 py-2 text-xs shadow-xl">
       <p className="font-semibold text-white">{d.area}</p>
-      <p className="text-[#94A3B8]">
+      <p className="text-white/70">
         {d.days} días — {d.percentage}%
       </p>
     </div>
@@ -96,7 +96,7 @@ export function AreaPieChart({ data }: AreaPieChartProps) {
         <Tooltip content={<CustomTooltip />} />
         <Legend
           formatter={(value) => (
-            <span className="text-xs text-[#94A3B8]">{value}</span>
+            <span className="text-xs text-white/70">{value}</span>
           )}
         />
       </PieChart>
@@ -106,7 +106,7 @@ export function AreaPieChart({ data }: AreaPieChartProps) {
 
 function EmptyChart({ message }: { message: string }) {
   return (
-    <div className="flex h-[280px] items-center justify-center text-center text-sm text-[#475569]">
+    <div className="flex h-[280px] items-center justify-center text-center text-sm text-white/50">
       {message}
     </div>
   );

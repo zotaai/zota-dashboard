@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className="bg-[#1565C0]">
+    <html lang="es">
       <body className={`${inter.variable} ${poppins.variable} font-sans antialiased`}>
         <StoreProvider>
           {children}
