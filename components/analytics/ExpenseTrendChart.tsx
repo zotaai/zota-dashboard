@@ -20,8 +20,8 @@ interface ExpenseTrendChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#1976D2] px-3 py-2 text-xs shadow-xl">
-      <p className="mb-1 font-semibold text-white">{label}</p>
+    <div className="rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-xs shadow-xl">
+      <p className="mb-1 font-semibold text-[#1E293B]">{label}</p>
       <p className="text-[#10B981]">
         Gastos:{" "}
         <span className="font-bold">
@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-[280px] items-center justify-center text-center text-sm text-white/50">
+      <div className="flex h-[280px] items-center justify-center text-center text-sm text-[#94A3B8]">
         Sin gastos registrados. Añade gastos en tus reportes para ver la tendencia.
       </div>
     );
@@ -52,7 +52,7 @@ export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="rgba(255,255,255,0.05)"
+          stroke="rgba(0,0,0,0.08)"
           vertical={false}
         />
         <XAxis
@@ -73,8 +73,8 @@ export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
           dataKey="expenses"
           stroke="#10B981"
           strokeWidth={2.5}
-          dot={<Dot fill="#10B981" r={4} stroke="#1976D2" strokeWidth={2} />}
-          activeDot={{ r: 6, fill: "#10B981", stroke: "#1976D2", strokeWidth: 2 }}
+          dot={<Dot fill="#10B981" r={4} stroke="#FFFFFF" strokeWidth={2} />}
+          activeDot={{ r: 6, fill: "#10B981", stroke: "#FFFFFF", strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>

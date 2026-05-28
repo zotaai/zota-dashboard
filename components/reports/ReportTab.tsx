@@ -49,14 +49,14 @@ function StepIndicator({ current, done }: { current: number; done: boolean }) {
                     ? "bg-[#0296DF] text-white"
                     : active
                     ? "border-2 border-[#0296DF] bg-transparent text-[#0296DF]"
-                    : "border border-white/20 bg-white/5 text-white/50"
+                    : "border border-black/10 bg-black/[0.04] text-[#94A3B8]"
                 }`}
               >
                 {completed ? <Check className="h-3.5 w-3.5" /> : step.n}
               </div>
               <span
                 className={`text-[10px] font-medium uppercase tracking-wide ${
-                  completed ? "text-[#0296DF]" : active ? "text-white" : "text-white/50"
+                  completed ? "text-[#0296DF]" : active ? "text-[#1E293B]" : "text-[#94A3B8]"
                 }`}
               >
                 {step.label}
@@ -67,7 +67,7 @@ function StepIndicator({ current, done }: { current: number; done: boolean }) {
             {i < STEPS.length - 1 && (
               <div
                 className={`mx-1 mb-4 h-px flex-1 transition-all ${
-                  step.n < current || done ? "bg-[#0296DF]/60" : "bg-white/10"
+                  step.n < current || done ? "bg-[#0296DF]/60" : "bg-black/[0.06]"
                 }`}
               />
             )}
@@ -309,7 +309,7 @@ export function ReportTab() {
 
       {/* Draft indicator */}
       {!isSubmitted && lastSavedText && (
-        <div className="mt-2 flex items-center gap-1.5 text-xs text-white/60">
+        <div className="mt-2 flex items-center gap-1.5 text-xs text-[#64748B]">
           <Save className="h-3 w-3" />
           <span>Borrador guardado: {lastSavedText}</span>
         </div>
@@ -317,7 +317,7 @@ export function ReportTab() {
 
       {/* Hint */}
       {hint && (
-        <p className={`mt-3 text-xs ${hoursComplete && step3 ? "text-[#10B981]" : "text-white/60"}`}>
+        <p className={`mt-3 text-xs ${hoursComplete && step3 ? "text-[#10B981]" : "text-[#64748B]"}`}>
           {hint}
         </p>
       )}
@@ -362,7 +362,7 @@ export function ReportTab() {
                 variant="ghost"
                 size="sm"
                 onClick={handleExportPDF}
-                className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#0296DF]/40 hover:text-white"
+                className="h-8 border border-black/[0.08] bg-black/[0.04] text-xs text-[#475569] hover:border-[#0296DF]/40 hover:text-[#1E293B]"
               >
                 <Download className="mr-1.5 h-3.5 w-3.5" />
                 Exportar PDF
@@ -371,7 +371,7 @@ export function ReportTab() {
                 variant="ghost"
                 size="sm"
                 onClick={handleExportExcel}
-                className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#10B981]/40 hover:text-white"
+                className="h-8 border border-black/[0.08] bg-black/[0.04] text-xs text-[#475569] hover:border-[#10B981]/40 hover:text-[#1E293B]"
               >
                 <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
                 Exportar Excel
@@ -384,7 +384,7 @@ export function ReportTab() {
             variant="outline"
             onClick={handleSaveDraft}
             disabled={!canSaveDraft || saving}
-            className="w-full border-white/10 bg-white/5 py-5 text-sm font-medium text-white/70 hover:border-[#0296DF]/40 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+            className="w-full border-black/[0.08] bg-black/[0.04] py-5 text-sm font-medium text-[#475569] hover:border-[#0296DF]/40 hover:bg-black/[0.06] hover:text-[#1E293B] disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Save className="mr-2 h-4 w-4" />
             {saving ? "GUARDANDO…" : "GUARDAR AVANCE"}
@@ -409,7 +409,7 @@ export function ReportTab() {
             variant="ghost"
             size="sm"
             onClick={handleExportPDF}
-            className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#0296DF]/40 hover:text-white"
+            className="h-8 border border-black/[0.08] bg-black/[0.04] text-xs text-[#475569] hover:border-[#0296DF]/40 hover:text-[#1E293B]"
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Exportar PDF
@@ -418,7 +418,7 @@ export function ReportTab() {
             variant="ghost"
             size="sm"
             onClick={handleExportExcel}
-            className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#10B981]/40 hover:text-white"
+            className="h-8 border border-black/[0.08] bg-black/[0.04] text-xs text-[#475569] hover:border-[#10B981]/40 hover:text-[#1E293B]"
           >
             <FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />
             Exportar Excel
@@ -428,15 +428,15 @@ export function ReportTab() {
 
       {/* ── Success modals ── */}
       <Dialog open={successModal === "draft"} onOpenChange={() => setSuccessModal(null)}>
-        <DialogContent className="border border-white/10 bg-[#1976D2] text-white sm:max-w-sm">
+        <DialogContent className="border border-black/[0.08] bg-white text-[#1E293B] sm:max-w-sm">
           <DialogHeader className="items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0296DF]/15">
               <Save className="h-6 w-6 text-[#0296DF]" />
             </div>
-            <DialogTitle className="text-base font-semibold text-white">
+            <DialogTitle className="text-base font-semibold text-[#1E293B]">
               Avance guardado
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-white/70">
+            <DialogDescription className="text-center text-sm text-[#475569]">
               Tu progreso fue guardado correctamente. Puedes continuar registrando
               actividades y volver a guardar cuando quieras.
             </DialogDescription>
@@ -453,15 +453,15 @@ export function ReportTab() {
       </Dialog>
 
       <Dialog open={successModal === "submitted"} onOpenChange={() => setSuccessModal(null)}>
-        <DialogContent className="border border-white/10 bg-[#1976D2] text-white sm:max-w-sm">
+        <DialogContent className="border border-black/[0.08] bg-white text-[#1E293B] sm:max-w-sm">
           <DialogHeader className="items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#10B981]/15">
               <CheckCircle2 className="h-6 w-6 text-[#10B981]" />
             </div>
-            <DialogTitle className="text-base font-semibold text-white">
+            <DialogTitle className="text-base font-semibold text-[#1E293B]">
               Reporte enviado
             </DialogTitle>
-            <DialogDescription className="text-center text-sm text-white/70">
+            <DialogDescription className="text-center text-sm text-[#475569]">
               Se registró el reporte quincenal correctamente. Ya no podrás
               realizar cambios en este período.
             </DialogDescription>

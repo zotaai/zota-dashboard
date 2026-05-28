@@ -27,9 +27,9 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as AreaDataPoint;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#1976D2] px-3 py-2 text-xs shadow-xl">
-      <p className="font-semibold text-white">{d.area}</p>
-      <p className="text-white/70">
+    <div className="rounded-lg border border-black/[0.08] bg-white px-3 py-2 text-xs shadow-xl">
+      <p className="font-semibold text-[#1E293B]">{d.area}</p>
+      <p className="text-[#475569]">
         {d.days} días — {d.percentage}%
       </p>
     </div>
@@ -96,7 +96,7 @@ export function AreaPieChart({ data }: AreaPieChartProps) {
         <Tooltip content={<CustomTooltip />} />
         <Legend
           formatter={(value) => (
-            <span className="text-xs text-white/70">{value}</span>
+            <span className="text-xs text-[#475569]">{value}</span>
           )}
         />
       </PieChart>
@@ -106,7 +106,7 @@ export function AreaPieChart({ data }: AreaPieChartProps) {
 
 function EmptyChart({ message }: { message: string }) {
   return (
-    <div className="flex h-[280px] items-center justify-center text-center text-sm text-white/50">
+    <div className="flex h-[280px] items-center justify-center text-center text-sm text-[#94A3B8]">
       {message}
     </div>
   );

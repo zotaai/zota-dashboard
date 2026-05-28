@@ -3,14 +3,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Zota AI Consulting – Slate Blue Theme */
+/* Zota AI Consulting – Celeste gradient + light content card */
 :root {
   --background: #1565C0;
-  --foreground: #F1F5F9;
-  --card: rgba(255, 255, 255, 0.07);
-  --card-foreground: #F1F5F9;
-  --popover: #023ABF;
-  --popover-foreground: #F1F5F9;
+  --foreground: #1E293B;
+  --card: #F8FAFC;
+  --card-foreground: #1E293B;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E293B;
   --primary: #0296DF;
   --primary-foreground: #FFFFFF;
   --secondary: #1e3a5f;
@@ -42,11 +42,11 @@
 
 .dark {
   --background: #1565C0;
-  --foreground: #F1F5F9;
-  --card: rgba(255, 255, 255, 0.07);
-  --card-foreground: #F1F5F9;
-  --popover: #023ABF;
-  --popover-foreground: #F1F5F9;
+  --foreground: #1E293B;
+  --card: #F8FAFC;
+  --card-foreground: #1E293B;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E293B;
   --primary: #0296DF;
   --primary-foreground: #FFFFFF;
   --secondary: #1e3a5f;

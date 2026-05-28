@@ -11,13 +11,13 @@ import { useStore } from "@/lib/store";
 import { isConfigured } from "@/lib/supabase";
 
 const TAB_CLASS =
-  "flex flex-1 items-center justify-center gap-2 rounded-none py-3 text-sm font-medium tracking-wide text-white/70 transition-colors data-[state=active]:bg-[#0296DF]/10 data-[state=active]:text-[#0296DF]";
+  "flex flex-1 items-center justify-center gap-2 rounded-none py-3 text-sm font-medium tracking-wide text-[#64748B] transition-colors hover:text-[#1E293B] data-[state=active]:bg-[#0296DF] data-[state=active]:text-white";
 
 function LoadingScreen() {
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-[#0296DF]" />
-      <p className="text-sm text-white/60">Iniciando aplicación…</p>
+      <p className="text-sm text-[#64748B]">Iniciando aplicación…</p>
     </div>
   );
 }
@@ -27,7 +27,7 @@ function StatusBar() {
 
   if (!isConfigured) {
     return (
-      <div className="flex items-center gap-1.5 rounded-full border border-[#F59E0B]/30 bg-[#F59E0B]/10 px-3 py-1 text-xs text-[#F59E0B]">
+      <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-[#F59E0B] px-3 py-1 text-xs font-medium text-white shadow-sm">
         <WifiOff className="h-3 w-3" />
         Modo local — configura NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
       </div>
@@ -36,7 +36,7 @@ function StatusBar() {
 
   if (syncing) {
     return (
-      <div className="flex items-center gap-1.5 rounded-full border border-[#0296DF]/20 bg-[#0296DF]/10 px-3 py-1 text-xs text-[#0296DF]">
+      <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-[#023ABF] px-3 py-1 text-xs font-medium text-white shadow-sm">
         <RefreshCw className="h-3 w-3 animate-spin" />
         Sincronizando con Supabase…
       </div>
@@ -45,7 +45,7 @@ function StatusBar() {
 
   if (connected) {
     return (
-      <div className="flex items-center gap-1.5 rounded-full border border-[#10B981]/20 bg-[#10B981]/10 px-3 py-1 text-xs text-[#10B981]">
+      <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-[#10B981] px-3 py-1 text-xs font-medium text-white shadow-sm">
         <Database className="h-3 w-3" />
         Supabase · Tiempo real activo
       </div>
@@ -53,7 +53,7 @@ function StatusBar() {
   }
 
   return (
-    <div className="flex items-center gap-1.5 rounded-full border border-[#EF4444]/20 bg-[#EF4444]/10 px-3 py-1 text-xs text-[#EF4444]">
+    <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-[#EF4444] px-3 py-1 text-xs font-medium text-white shadow-sm">
       <WifiOff className="h-3 w-3" />
       Sin conexión a Supabase — usando caché local
     </div>
@@ -71,21 +71,21 @@ export function Dashboard() {
         <StatusBar />
       </div>
 
-      <div className="mx-auto max-w-6xl rounded-xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-md">
+      <div className="mx-auto max-w-6xl overflow-hidden rounded-xl border border-white/40 bg-[#F8FAFC] shadow-2xl">
         {loading ? (
           <LoadingScreen />
         ) : (
           <Tabs defaultValue="reports" className="w-full">
-            <TabsList className="flex w-full rounded-none rounded-t-xl border-b border-white/10 bg-transparent p-0">
-              <TabsTrigger value="reports"   className={`${TAB_CLASS} rounded-tl-xl border-r border-white/10`}>
+            <TabsList className="flex w-full rounded-none rounded-t-xl border-b border-black/[0.08] bg-transparent p-0">
+              <TabsTrigger value="reports"   className={`${TAB_CLASS} rounded-tl-xl border-r border-black/[0.08]`}>
                 <FileText className="h-4 w-4" />
                 <span className="hidden sm:inline">MIS REPORTES</span>
               </TabsTrigger>
-              <TabsTrigger value="history"   className={`${TAB_CLASS} border-r border-white/10`}>
+              <TabsTrigger value="history"   className={`${TAB_CLASS} border-r border-black/[0.08]`}>
                 <BookOpen className="h-4 w-4" />
                 <span className="hidden sm:inline">REPORTES</span>
               </TabsTrigger>
-              <TabsTrigger value="analytics" className={`${TAB_CLASS} border-r border-white/10`}>
+              <TabsTrigger value="analytics" className={`${TAB_CLASS} border-r border-black/[0.08]`}>
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">ANALYTICS</span>
               </TabsTrigger>
@@ -104,7 +104,7 @@ export function Dashboard() {
       </div>
 
       <footer className="mx-auto mt-6 max-w-6xl text-center">
-        <p className="text-xs tracking-wide text-white/50">
+        <p className="text-xs tracking-wide text-white/70">
           © 2026 Zota AI Consulting. Elite AI B2B Solutions.
         </p>
       </footer>

@@ -50,10 +50,10 @@ export function ActivityTable({
     <div className="mb-6">
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1E293B]">
             Registro de Dedicaciones
           </h3>
-          <p className="text-xs text-white/60">
+          <p className="text-xs text-[#64748B]">
             Registre las actividades realizadas durante el período
           </p>
         </div>
@@ -67,28 +67,28 @@ export function ActivityTable({
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-white/10">
+      <div className="overflow-hidden rounded-lg border border-black/[0.08]">
         {/* ── Header ── same COLS as rows */}
-        <div className={`grid ${COLS} gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5`}>
-          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
+        <div className={`grid ${COLS} gap-2 border-b border-black/[0.08] bg-black/[0.03] px-4 py-2.5`}>
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Descripción de la Actividad
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Cliente
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Proyecto
           </span>
-          <span className="text-xs font-medium uppercase tracking-wider text-white/60">
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Días
           </span>
           <span />
         </div>
 
         {/* ── Rows ── */}
-        <div className="divide-y divide-white/5">
+        <div className="divide-y divide-black/[0.06]">
           {activities.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-white/50">
+            <div className="px-4 py-8 text-center text-sm text-[#94A3B8]">
               No hay actividades registradas. Haga clic en{" "}
               <span className="text-[#0296DF]">Añadir</span> para comenzar.
             </div>
@@ -98,14 +98,14 @@ export function ActivityTable({
               return (
                 <div
                   key={activity.id}
-                  className={`grid ${COLS} items-center gap-2 px-4 py-2 transition-colors hover:bg-white/[0.02]`}
+                  className={`grid ${COLS} items-center gap-2 px-4 py-2 transition-colors hover:bg-black/[0.03]`}
                 >
                   {/* Descripción */}
                   <Input
                     placeholder="Descripción de la actividad"
                     value={activity.description}
                     onChange={(e) => onUpdate(activity.id, "description", e.target.value)}
-                    className="h-8 border-transparent bg-white/5 text-sm text-white placeholder:text-white/50 focus:border-[#0296DF] focus:bg-white/10"
+                    className="h-8 border-transparent bg-black/[0.04] text-sm text-[#1E293B] placeholder:text-[#94A3B8] focus:border-[#0296DF] focus:bg-black/[0.06]"
                   />
 
                   {/* Cliente — wrapped in min-w-0 so it can't overflow the cell */}
@@ -114,15 +114,15 @@ export function ActivityTable({
                       value={activity.client}
                       onValueChange={(v) => handleClientChange(activity.id, v)}
                     >
-                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:truncate [&>span]:block">
+                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-black/[0.04] text-sm text-[#1E293B] focus:border-[#0296DF] [&>span]:truncate [&>span]:block">
                         <SelectValue placeholder="Cliente" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#023ABF]">
+                      <SelectContent className="border-black/[0.08] bg-white">
                         {clients.map((c) => (
                           <SelectItem
                             key={c}
                             value={c}
-                            className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
+                            className="text-sm text-[#1E293B] focus:bg-[#0296DF]/20 focus:text-[#1E293B]"
                           >
                             {c}
                           </SelectItem>
@@ -138,7 +138,7 @@ export function ActivityTable({
                       onValueChange={(v) => onUpdate(activity.id, "project", v)}
                       disabled={!activity.client || availableProjects.length === 0}
                     >
-                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:opacity-40 [&>span]:truncate [&>span]:block">
+                      <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-black/[0.04] text-sm text-[#1E293B] focus:border-[#0296DF] disabled:opacity-40 [&>span]:truncate [&>span]:block">
                         <SelectValue
                           placeholder={
                             !activity.client
@@ -149,12 +149,12 @@ export function ActivityTable({
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#023ABF]">
+                      <SelectContent className="border-black/[0.08] bg-white">
                         {availableProjects.map((p) => (
                           <SelectItem
                             key={p.name}
                             value={p.name}
-                            className="text-sm text-white focus:bg-[#0296DF]/20 focus:text-white"
+                            className="text-sm text-[#1E293B] focus:bg-[#0296DF]/20 focus:text-[#1E293B]"
                           >
                             {p.name}
                           </SelectItem>
@@ -173,7 +173,7 @@ export function ActivityTable({
                     onChange={(e) =>
                       onUpdate(activity.id, "days", parseFloat(e.target.value) || 0)
                     }
-                    className="h-8 border-transparent bg-white/5 text-center text-sm text-white focus:border-[#0296DF] focus:bg-white/10"
+                    className="h-8 border-transparent bg-black/[0.04] text-center text-sm text-[#1E293B] focus:border-[#0296DF] focus:bg-black/[0.06]"
                   />
 
                   {/* Eliminar */}
@@ -182,7 +182,7 @@ export function ActivityTable({
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(activity.id)}
-                      className="h-7 w-7 text-white/60 hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
+                      className="h-7 w-7 text-[#64748B] hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

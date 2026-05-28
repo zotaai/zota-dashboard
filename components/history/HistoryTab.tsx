@@ -173,17 +173,17 @@ export function HistoryTab() {
 
       {/* Header + filters */}
       <div>
-        <h2 className="mb-0.5 text-base font-semibold tracking-wide text-white">
+        <h2 className="mb-0.5 text-base font-semibold tracking-wide text-[#1E293B]">
           REPORTES ENVIADOS
         </h2>
-        <p className="mb-4 text-xs text-white/60">
+        <p className="mb-4 text-xs text-[#64748B]">
           Consulta los registros de dedicaciones y gastos de todos los reportes quincenales publicados.
         </p>
 
         <div className="flex flex-wrap gap-3">
           {/* User filter */}
           <Select value={filterUser} onValueChange={handleUserChange}>
-            <SelectTrigger className="h-9 w-48 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
+            <SelectTrigger className="h-9 w-48 border-black/[0.08] bg-black/[0.04] text-sm text-[#1E293B] focus:border-[#0296DF]">
               <SelectValue placeholder="Todos los usuarios" />
             </SelectTrigger>
             <SelectContent>
@@ -196,7 +196,7 @@ export function HistoryTab() {
 
           {/* Filter type */}
           <Select value={filterType} onValueChange={handleTypeChange}>
-            <SelectTrigger className="h-9 w-40 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
+            <SelectTrigger className="h-9 w-40 border-black/[0.08] bg-black/[0.04] text-sm text-[#1E293B] focus:border-[#0296DF]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -214,7 +214,7 @@ export function HistoryTab() {
             onValueChange={setFilterValue}
             disabled={filterOptions.length === 0}
           >
-            <SelectTrigger className="h-9 w-60 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
+            <SelectTrigger className="h-9 w-60 border-black/[0.08] bg-black/[0.04] text-sm text-[#1E293B] focus:border-[#0296DF]">
               <SelectValue placeholder="Todos los períodos" />
             </SelectTrigger>
             <SelectContent>
@@ -231,9 +231,9 @@ export function HistoryTab() {
 
       {/* Empty state */}
       {submitted.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-white/10 py-16 text-center">
-          <FileX className="h-8 w-8 text-white/50" />
-          <p className="text-sm text-white/50">Aún no hay reportes enviados.</p>
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-black/[0.08] py-16 text-center">
+          <FileX className="h-8 w-8 text-[#94A3B8]" />
+          <p className="text-sm text-[#94A3B8]">Aún no hay reportes enviados.</p>
         </div>
       ) : (
         <>
@@ -241,39 +241,39 @@ export function HistoryTab() {
           <section>
             <div className="mb-3 flex items-center gap-2">
               <ClipboardList className="h-4 w-4 text-[#0296DF]" />
-              <h3 className="text-sm font-semibold text-white">Registros de Dedicaciones</h3>
-              <span className="ml-auto text-xs text-white/60">
+              <h3 className="text-sm font-semibold text-[#1E293B]">Registros de Dedicaciones</h3>
+              <span className="ml-auto text-xs text-[#64748B]">
                 {totalDays} {totalDays === 1 ? "día" : "días"} en total
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-white/10">
+            <div className="overflow-hidden rounded-lg border border-black/[0.08]">
               {/* Table header */}
-              <div className="grid grid-cols-[150px_170px_1fr_120px_130px_64px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
+              <div className="grid grid-cols-[150px_170px_1fr_120px_130px_64px] gap-2 border-b border-black/[0.08] bg-black/[0.03] px-4 py-2.5">
                 {["Usuario","Período","Descripción","Cliente","Proyecto","Días"].map(h => (
-                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-white/60">
+                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
                     {h}
                   </span>
                 ))}
               </div>
 
               {/* Rows */}
-              <div className="max-h-96 divide-y divide-white/5 overflow-y-auto">
+              <div className="max-h-96 divide-y divide-black/[0.06] overflow-y-auto">
                 {activityRows.length === 0 ? (
-                  <div className="px-4 py-10 text-center text-sm text-white/50">
+                  <div className="px-4 py-10 text-center text-sm text-[#94A3B8]">
                     Sin registros para el filtro seleccionado.
                   </div>
                 ) : (
                   activityRows.map((a, i) => (
                     <div
                       key={`act-${a.id}-${i}`}
-                      className="grid grid-cols-[150px_170px_1fr_120px_130px_64px] items-center gap-2 px-4 py-2.5 transition-colors hover:bg-white/[0.02]"
+                      className="grid grid-cols-[150px_170px_1fr_120px_130px_64px] items-center gap-2 px-4 py-2.5 transition-colors hover:bg-black/[0.03]"
                     >
                       <span className="truncate text-xs text-[#CBD5E1]">{a.userName}</span>
-                      <span className="truncate text-xs text-white/60">{a.periodName}</span>
-                      <span className="truncate text-xs text-white/70">{a.description || "—"}</span>
-                      <span className="truncate text-xs text-white/60">{a.client || "—"}</span>
-                      <span className="truncate text-xs text-white/60">{a.project || "—"}</span>
+                      <span className="truncate text-xs text-[#64748B]">{a.periodName}</span>
+                      <span className="truncate text-xs text-[#475569]">{a.description || "—"}</span>
+                      <span className="truncate text-xs text-[#64748B]">{a.client || "—"}</span>
+                      <span className="truncate text-xs text-[#64748B]">{a.project || "—"}</span>
                       <span className="text-xs font-semibold text-[#0296DF]">{a.days}</span>
                     </div>
                   ))
@@ -282,8 +282,8 @@ export function HistoryTab() {
 
               {/* Footer total */}
               {activityRows.length > 0 && (
-                <div className="flex justify-end border-t border-white/10 bg-[#ffffff05] px-4 py-2">
-                  <span className="text-xs text-white/60">
+                <div className="flex justify-end border-t border-black/[0.08] bg-black/[0.03] px-4 py-2">
+                  <span className="text-xs text-[#64748B]">
                     Total: <span className="font-semibold text-[#0296DF]">{totalDays} días</span>
                   </span>
                 </div>
@@ -295,37 +295,37 @@ export function HistoryTab() {
           <section>
             <div className="mb-3 flex items-center gap-2">
               <Receipt className="h-4 w-4 text-[#10B981]" />
-              <h3 className="text-sm font-semibold text-white">Registros de Gastos</h3>
-              <span className="ml-auto text-xs text-white/60">
+              <h3 className="text-sm font-semibold text-[#1E293B]">Registros de Gastos</h3>
+              <span className="ml-auto text-xs text-[#64748B]">
                 ${totalExpenses.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total
               </span>
             </div>
 
-            <div className="overflow-hidden rounded-lg border border-white/10">
+            <div className="overflow-hidden rounded-lg border border-black/[0.08]">
               {/* Table header */}
-              <div className="grid grid-cols-[150px_170px_1fr_130px] gap-2 border-b border-white/10 bg-[#ffffff05] px-4 py-2.5">
+              <div className="grid grid-cols-[150px_170px_1fr_130px] gap-2 border-b border-black/[0.08] bg-black/[0.03] px-4 py-2.5">
                 {["Usuario","Período","Descripción","Monto"].map(h => (
-                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-white/60">
+                  <span key={h} className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
                     {h}
                   </span>
                 ))}
               </div>
 
               {/* Rows */}
-              <div className="max-h-64 divide-y divide-white/5 overflow-y-auto">
+              <div className="max-h-64 divide-y divide-black/[0.06] overflow-y-auto">
                 {expenseRows.length === 0 ? (
-                  <div className="px-4 py-10 text-center text-sm text-white/50">
+                  <div className="px-4 py-10 text-center text-sm text-[#94A3B8]">
                     Sin gastos para el filtro seleccionado.
                   </div>
                 ) : (
                   expenseRows.map((e, i) => (
                     <div
                       key={`exp-${e.id}-${i}`}
-                      className="grid grid-cols-[150px_170px_1fr_130px] items-center gap-2 px-4 py-2.5 transition-colors hover:bg-white/[0.02]"
+                      className="grid grid-cols-[150px_170px_1fr_130px] items-center gap-2 px-4 py-2.5 transition-colors hover:bg-black/[0.03]"
                     >
                       <span className="truncate text-xs text-[#CBD5E1]">{e.userName}</span>
-                      <span className="truncate text-xs text-white/60">{e.periodName}</span>
-                      <span className="truncate text-xs text-white/70">{e.description || "—"}</span>
+                      <span className="truncate text-xs text-[#64748B]">{e.periodName}</span>
+                      <span className="truncate text-xs text-[#475569]">{e.description || "—"}</span>
                       <span className="text-xs font-semibold text-[#10B981]">
                         ${e.amount.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
@@ -336,8 +336,8 @@ export function HistoryTab() {
 
               {/* Footer total */}
               {expenseRows.length > 0 && (
-                <div className="flex justify-end border-t border-white/10 bg-[#ffffff05] px-4 py-2">
-                  <span className="text-xs text-white/60">
+                <div className="flex justify-end border-t border-black/[0.08] bg-black/[0.03] px-4 py-2">
+                  <span className="text-xs text-[#64748B]">
                     Total:{" "}
                     <span className="font-semibold text-[#10B981]">
                       ${totalExpenses.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

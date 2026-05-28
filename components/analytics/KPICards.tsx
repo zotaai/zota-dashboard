@@ -18,9 +18,9 @@ interface KPICardProps {
 
 function KPICard({ icon: Icon, label, value, sub, color }: KPICardProps) {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#ffffff06] p-5 backdrop-blur-sm transition-colors hover:bg-[#ffffff0a]">
+    <div className="rounded-xl border border-black/[0.08] bg-black/[0.04] p-5 backdrop-blur-sm transition-colors hover:bg-black/[0.06]">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-white/60">
+        <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
           {label}
         </span>
         <div
@@ -30,8 +30,8 @@ function KPICard({ icon: Icon, label, value, sub, color }: KPICardProps) {
           <Icon className="h-4 w-4" style={{ color }} />
         </div>
       </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      {sub && <p className="mt-1 text-xs text-white/60">{sub}</p>}
+      <p className="text-2xl font-bold text-[#1E293B]">{value}</p>
+      {sub && <p className="mt-1 text-xs text-[#64748B]">{sub}</p>}
     </div>
   );
 }

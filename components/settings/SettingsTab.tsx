@@ -42,10 +42,10 @@ function NotionSyncSection() {
   return (
     <div>
       <div className="mb-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1E293B]">
           Sincronización con Notion
         </h3>
-        <p className="text-xs text-white/60">
+        <p className="text-xs text-[#64748B]">
           Importa clientes y proyectos desde la BD de Notion. También se
           actualiza automáticamente cada hora.
         </p>
@@ -85,13 +85,13 @@ export function SettingsTab() {
   return (
     <div className="space-y-8 p-5">
       <PeriodManager />
-      <Separator className="bg-white/10" />
+      <Separator className="bg-black/[0.06]" />
       <UserManager />
-      <Separator className="bg-white/10" />
+      <Separator className="bg-black/[0.06]" />
       <NotionSyncSection />
-      <Separator className="bg-white/10" />
+      <Separator className="bg-black/[0.06]" />
       <ClientManager />
-      <Separator className="bg-white/10" />
+      <Separator className="bg-black/[0.06]" />
       <ProjectManager />
     </div>
   );

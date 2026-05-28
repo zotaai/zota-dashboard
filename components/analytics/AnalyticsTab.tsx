@@ -20,12 +20,12 @@ function ChartCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#ffffff06] p-5">
+    <div className="rounded-xl border border-black/[0.08] bg-black/[0.04] p-5">
       <div className="mb-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-white">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#1E293B]">
           {title}
         </h3>
-        <p className="text-xs text-white/60">{subtitle}</p>
+        <p className="text-xs text-[#64748B]">{subtitle}</p>
       </div>
       {children}
     </div>
@@ -48,10 +48,10 @@ export function AnalyticsTab() {
     <div className="p-5">
       <div className="mb-5 flex items-center justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-wide text-white">
+          <h2 className="text-base font-semibold tracking-wide text-[#1E293B]">
             ANALYTICS
           </h2>
-          <p className="text-xs text-white/60">
+          <p className="text-xs text-[#64748B]">
             Resumen consolidado de todos los reportes enviados
           </p>
         </div>
@@ -60,7 +60,7 @@ export function AnalyticsTab() {
             variant="ghost"
             size="sm"
             onClick={handleExportAll}
-            className="h-8 border border-white/10 bg-white/5 text-xs text-white/70 hover:border-[#10B981]/40 hover:text-white"
+            className="h-8 border border-black/[0.08] bg-black/[0.04] text-xs text-[#475569] hover:border-[#10B981]/40 hover:text-[#1E293B]"
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Exportar todo (.xlsx)
