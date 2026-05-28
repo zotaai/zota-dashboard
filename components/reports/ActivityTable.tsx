@@ -117,7 +117,7 @@ export function ActivityTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:truncate [&>span]:block">
                         <SelectValue placeholder="Cliente" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                      <SelectContent className="border-white/10 bg-[#1a2d44]">
                         {clients.map((c) => (
                           <SelectItem
                             key={c}
@@ -149,7 +149,7 @@ export function ActivityTable({
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                      <SelectContent className="border-white/10 bg-[#1a2d44]">
                         {availableProjects.map((p) => (
                           <SelectItem
                             key={p.name}

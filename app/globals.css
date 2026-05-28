@@ -3,81 +3,80 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Zota AI Consulting - Dark Mode Premium Theme */
+/* Zota AI Consulting – Slate Blue Theme */
 :root {
-  /* Brand Colors: #0C112E (bg), #0296DF (primary), #023ABF (secondary) */
-  --background: #0C112E;
-  --foreground: #F8FAFC;
-  --card: rgba(15, 23, 60, 0.8);
-  --card-foreground: #F8FAFC;
-  --popover: #0F172A;
-  --popover-foreground: #F8FAFC;
+  --background: #152238;
+  --foreground: #F1F5F9;
+  --card: rgba(255, 255, 255, 0.07);
+  --card-foreground: #F1F5F9;
+  --popover: #1a2d44;
+  --popover-foreground: #F1F5F9;
   --primary: #0296DF;
   --primary-foreground: #FFFFFF;
-  --secondary: #023ABF;
+  --secondary: #1e3a5f;
   --secondary-foreground: #FFFFFF;
-  --muted: rgba(30, 41, 82, 0.6);
+  --muted: rgba(100, 130, 170, 0.25);
   --muted-foreground: #94A3B8;
-  --accent: #023ABF;
+  --accent: #1e3a5f;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: rgba(2, 150, 223, 0.2);
-  --input: rgba(2, 150, 223, 0.15);
+  --border: rgba(100, 160, 220, 0.18);
+  --input: rgba(100, 160, 220, 0.12);
   --ring: #0296DF;
   --chart-1: #0296DF;
-  --chart-2: #023ABF;
+  --chart-2: #3B82F6;
   --chart-3: #10B981;
   --chart-4: #F59E0B;
   --chart-5: #EF4444;
   --radius: 0.75rem;
-  --sidebar: #0A0F24;
-  --sidebar-foreground: #F8FAFC;
+  --sidebar: #0e1c30;
+  --sidebar-foreground: #F1F5F9;
   --sidebar-primary: #0296DF;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #023ABF;
+  --sidebar-accent: #1e3a5f;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(2, 150, 223, 0.2);
+  --sidebar-border: rgba(100, 160, 220, 0.18);
   --sidebar-ring: #0296DF;
 }
 
 .dark {
-  --background: #0C112E;
-  --foreground: #F8FAFC;
-  --card: rgba(15, 23, 60, 0.8);
-  --card-foreground: #F8FAFC;
-  --popover: #0F172A;
-  --popover-foreground: #F8FAFC;
+  --background: #152238;
+  --foreground: #F1F5F9;
+  --card: rgba(255, 255, 255, 0.07);
+  --card-foreground: #F1F5F9;
+  --popover: #1a2d44;
+  --popover-foreground: #F1F5F9;
   --primary: #0296DF;
   --primary-foreground: #FFFFFF;
-  --secondary: #023ABF;
+  --secondary: #1e3a5f;
   --secondary-foreground: #FFFFFF;
-  --muted: rgba(30, 41, 82, 0.6);
+  --muted: rgba(100, 130, 170, 0.25);
   --muted-foreground: #94A3B8;
-  --accent: #023ABF;
+  --accent: #1e3a5f;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --border: rgba(2, 150, 223, 0.2);
-  --input: rgba(2, 150, 223, 0.15);
+  --border: rgba(100, 160, 220, 0.18);
+  --input: rgba(100, 160, 220, 0.12);
   --ring: #0296DF;
   --chart-1: #0296DF;
-  --chart-2: #023ABF;
+  --chart-2: #3B82F6;
   --chart-3: #10B981;
   --chart-4: #F59E0B;
   --chart-5: #EF4444;
-  --sidebar: #0A0F24;
-  --sidebar-foreground: #F8FAFC;
+  --sidebar: #0e1c30;
+  --sidebar-foreground: #F1F5F9;
   --sidebar-primary: #0296DF;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #023ABF;
+  --sidebar-accent: #1e3a5f;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: rgba(2, 150, 223, 0.2);
+  --sidebar-border: rgba(100, 160, 220, 0.18);
   --sidebar-ring: #0296DF;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
+  --font-sans: var(--font-poppins);
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -123,5 +122,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }

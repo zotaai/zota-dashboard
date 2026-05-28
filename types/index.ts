@@ -31,6 +31,7 @@ export interface Expense {
   client: string;
   project: string;
   amount: number;
+  expenseDate: string;   // ISO date "YYYY-MM-DD", empty = not set
   fileName: string | null;
   fileData: string | null;
 }

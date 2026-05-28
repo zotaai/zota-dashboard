@@ -131,9 +131,9 @@ export async function exportReportToPDF(
     autoTable(doc, {
       startY: y,
       margin: { left: margin, right: margin },
-      head: [["Descripción del Gasto", "Categoría", "Cliente", "Proyecto", "Monto (USD)"]],
-      body: report.expenses.map((e) => [e.description, e.category || "—", e.client || "—", e.project || "—", formatCurrency(e.amount)]),
-      foot: [[{ content: "TOTAL GASTOS", colSpan: 4, styles: { halign: "right" } }, formatCurrency(report.totalExpenses)]],
+      head: [["Descripción del Gasto", "Categoría", "Cliente", "Proyecto", "Fecha", "Monto (USD)"]],
+      body: report.expenses.map((e) => [e.description, e.category || "—", e.client || "—", e.project || "—", e.expenseDate || "—", formatCurrency(e.amount)]),
+      foot: [[{ content: "TOTAL GASTOS", colSpan: 5, styles: { halign: "right" } }, formatCurrency(report.totalExpenses)]],
       headStyles: { fillColor: BRAND.navy, textColor: BRAND.white, fontStyle: "bold", fontSize: 8 },
       bodyStyles: { fontSize: 8, textColor: BRAND.text },
       footStyles: { fillColor: BRAND.green, textColor: BRAND.white, fontStyle: "bold", fontSize: 8 },

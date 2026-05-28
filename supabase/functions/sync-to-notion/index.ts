@@ -124,17 +124,20 @@ async function upsertActivityPage(
 // ── Expenses ───────────────────────────────────────────────────────────────────
 
 function buildExpenseProperties(
-  expense:       { description: string; category: string; client: string; project: string; amount: number },
+  expense:       { description: string; category: string; client: string; project: string; amount: number; expense_date?: string | null },
   userName:      string,
   submittedAt:   string,
   projectPageId: string | null,
 ): Record<string, unknown> {
+  // Use the actual expense date if set, otherwise fall back to submission date
+  const fechaDate = expense.expense_date ?? submittedAt.split("T")[0];
+
   const props: Record<string, unknown> = {
     "Concepto":  { title:     richText(expense.description ?? "") },
     "Cliente":   { rich_text: richText(expense.client  ?? "") },
     "Monto":     { number:    Number(expense.amount) ?? 0 },
     "Proveedor": { select:    { name: userName } },
-    "Fecha":     { date:      { start: submittedAt.split("T")[0] } },
+    "Fecha":     { date:      { start: fechaDate } },
   };
 
   // Categoría — only set when a value was chosen (select field)
@@ -206,7 +209,7 @@ Deno.serve(async (req) => {
       .eq("report_id", record.id),
     supabase
       .from("expenses")
-      .select("id, description, category, client, project, amount")
+      .select("id, description, category, client, project, amount, expense_date")
       .eq("report_id", record.id),
     supabase.from("users").select("name").eq("id", record.user_id).single(),
     supabase.from("periods").select("name").eq("id", record.period_id).single(),

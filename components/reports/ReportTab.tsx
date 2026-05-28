@@ -185,7 +185,7 @@ export function ReportTab() {
   const addExpense = () =>
     setExpenses((prev) => [
       ...prev,
-      { id: Date.now().toString(), description: "", category: "", client: "", project: "", amount: 0, fileName: null, fileData: null },
+      { id: Date.now().toString(), description: "", category: "", client: "", project: "", amount: 0, expenseDate: "", fileName: null, fileData: null },
     ]);
 
   const updateExpense = (id: string, field: keyof Expense, value: string | number | null) =>
@@ -428,7 +428,7 @@ export function ReportTab() {
 
       {/* ── Success modals ── */}
       <Dialog open={successModal === "draft"} onOpenChange={() => setSuccessModal(null)}>
-        <DialogContent className="border border-white/10 bg-[#0F172A] text-white sm:max-w-sm">
+        <DialogContent className="border border-white/10 bg-[#1a2d44] text-white sm:max-w-sm">
           <DialogHeader className="items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0296DF]/15">
               <Save className="h-6 w-6 text-[#0296DF]" />
@@ -453,7 +453,7 @@ export function ReportTab() {
       </Dialog>
 
       <Dialog open={successModal === "submitted"} onOpenChange={() => setSuccessModal(null)}>
-        <DialogContent className="border border-white/10 bg-[#0F172A] text-white sm:max-w-sm">
+        <DialogContent className="border border-white/10 bg-[#1a2d44] text-white sm:max-w-sm">
           <DialogHeader className="items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#10B981]/15">
               <CheckCircle2 className="h-6 w-6 text-[#10B981]" />

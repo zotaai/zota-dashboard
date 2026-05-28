@@ -20,7 +20,7 @@ interface ExpenseTrendChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0F172A] px-3 py-2 text-xs shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-[#1a2d44] px-3 py-2 text-xs shadow-xl">
       <p className="mb-1 font-semibold text-white">{label}</p>
       <p className="text-[#10B981]">
         Gastos:{" "}
@@ -73,8 +73,8 @@ export function ExpenseTrendChart({ data }: ExpenseTrendChartProps) {
           dataKey="expenses"
           stroke="#10B981"
           strokeWidth={2.5}
-          dot={<Dot fill="#10B981" r={4} stroke="#0F172A" strokeWidth={2} />}
-          activeDot={{ r: 6, fill: "#10B981", stroke: "#0F172A", strokeWidth: 2 }}
+          dot={<Dot fill="#10B981" r={4} stroke="#1a2d44" strokeWidth={2} />}
+          activeDot={{ r: 6, fill: "#10B981", stroke: "#1a2d44", strokeWidth: 2 }}
         />
       </LineChart>
     </ResponsiveContainer>

@@ -27,7 +27,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   if (!active || !payload?.length) return null;
   const d = payload[0].payload as AreaDataPoint;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0F172A] px-3 py-2 text-xs shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-[#1a2d44] px-3 py-2 text-xs shadow-xl">
       <p className="font-semibold text-white">{d.area}</p>
       <p className="text-[#94A3B8]">
         {d.days} días — {d.percentage}%

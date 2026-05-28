@@ -14,7 +14,8 @@ import {
 import type { Expense, Project } from "@/types";
 
 // Single source of truth for the column layout
-const COLS = "grid-cols-[1fr_1fr_1fr_1fr_85px_130px_36px]";
+// Desc | Categoría | Cliente | Proyecto | Fecha | Monto | Factura | Del
+const COLS = "grid-cols-[1.2fr_1fr_1fr_1fr_100px_72px_100px_36px]";
 
 interface ExpenseTableProps {
   expenses: Expense[];
@@ -98,6 +99,9 @@ export function ExpenseTable({
             Proyecto
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
+            Fecha
+          </span>
+          <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
             Monto ($)
           </span>
           <span className="text-xs font-medium uppercase tracking-wider text-[#64748B]">
@@ -138,7 +142,7 @@ export function ExpenseTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
                         <SelectValue placeholder="Categoría" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                      <SelectContent className="border-white/10 bg-[#1a2d44]">
                         {expenseCategories.map((c) => (
                           <SelectItem
                             key={c}
@@ -161,7 +165,7 @@ export function ExpenseTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
                         <SelectValue placeholder="Cliente" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                      <SelectContent className="border-white/10 bg-[#1a2d44]">
                         {clients.map((c) => (
                           <SelectItem
                             key={c}
@@ -193,7 +197,7 @@ export function ExpenseTable({
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#0F172A]">
+                      <SelectContent className="border-white/10 bg-[#1a2d44]">
                         {availableProjects.map((p) => (
                           <SelectItem
                             key={p.name}
@@ -206,6 +210,14 @@ export function ExpenseTable({
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* Fecha del gasto */}
+                  <Input
+                    type="date"
+                    value={expense.expenseDate}
+                    onChange={(e) => onUpdate(expense.id, "expenseDate", e.target.value)}
+                    className="h-8 border-transparent bg-white/5 text-xs text-white focus:border-[#0296DF] focus:bg-white/10 [color-scheme:dark]"
+                  />
 
                   {/* Monto */}
                   <Input
