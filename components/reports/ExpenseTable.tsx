@@ -142,7 +142,7 @@ export function ExpenseTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
                         <SelectValue placeholder="Categoría" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1a2d44]">
+                      <SelectContent className="border-white/10 bg-[#1976D2]">
                         {expenseCategories.map((c) => (
                           <SelectItem
                             key={c}
@@ -165,7 +165,7 @@ export function ExpenseTable({
                       <SelectTrigger className="h-8 w-full overflow-hidden border-transparent bg-white/5 text-sm text-white focus:border-[#0296DF] [&>span]:block [&>span]:truncate">
                         <SelectValue placeholder="Cliente" />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1a2d44]">
+                      <SelectContent className="border-white/10 bg-[#1976D2]">
                         {clients.map((c) => (
                           <SelectItem
                             key={c}
@@ -197,7 +197,7 @@ export function ExpenseTable({
                           }
                         />
                       </SelectTrigger>
-                      <SelectContent className="border-white/10 bg-[#1a2d44]">
+                      <SelectContent className="border-white/10 bg-[#1976D2]">
                         {availableProjects.map((p) => (
                           <SelectItem
                             key={p.name}

@@ -39,7 +39,7 @@ export function ReportFilters({
           <SelectTrigger className="h-9 w-full border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
             <SelectValue placeholder="Seleccione usuario" />
           </SelectTrigger>
-          <SelectContent className="border-white/10 bg-[#1a2d44]">
+          <SelectContent className="border-white/10 bg-[#1976D2]">
             {users.map((u) => (
               <SelectItem
                 key={u.id}
@@ -66,7 +66,7 @@ export function ReportFilters({
           <SelectTrigger className="h-9 w-full border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF] disabled:cursor-not-allowed">
             <SelectValue placeholder="Seleccione período" />
           </SelectTrigger>
-          <SelectContent className="border-white/10 bg-[#1a2d44]">
+          <SelectContent className="border-white/10 bg-[#1976D2]">
             {periods.map((p) => (
               <SelectItem
                 key={p.id}

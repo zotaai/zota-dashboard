@@ -61,7 +61,7 @@ export function ProjectManager() {
             <SelectTrigger className="h-9 w-44 shrink-0 border-white/10 bg-white/5 text-sm text-white focus:border-[#0296DF]">
               <SelectValue placeholder="Cliente" />
             </SelectTrigger>
-            <SelectContent className="border-white/10 bg-[#1a2d44]">
+            <SelectContent className="border-white/10 bg-[#1976D2]">
               {state.clients.map((c) => (
                 <SelectItem
                   key={c}

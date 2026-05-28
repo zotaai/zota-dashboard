@@ -19,7 +19,7 @@ interface TimelineBarChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#1a2d44] px-3 py-2 text-xs shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-[#1976D2] px-3 py-2 text-xs shadow-xl">
       <p className="mb-1 font-semibold text-white">{label}</p>
       <p className="text-[#0296DF]">
         Días registrados:{" "}

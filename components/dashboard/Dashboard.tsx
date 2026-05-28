@@ -64,7 +64,7 @@ export function Dashboard() {
   const { loading } = useStore();
 
   return (
-    <div className="min-h-screen bg-[#152238] px-4 py-6 md:px-8 md:py-8">
+    <div className="min-h-screen bg-[#1565C0] px-4 py-6 md:px-8 md:py-8">
       <DashboardHeader />
 
       <div className="mx-auto mb-3 max-w-6xl">
