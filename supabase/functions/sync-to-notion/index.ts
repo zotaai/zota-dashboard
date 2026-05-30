@@ -136,7 +136,7 @@ function buildExpenseProperties(
     "Concepto":  { title:     richText(expense.description ?? "") },
     "Cliente":   { rich_text: richText(expense.client  ?? "") },
     "Monto":     { number:    Number(expense.amount) ?? 0 },
-    "Proveedor": { select:    { name: userName } },
+    "Proveedor": { rich_text: richText(userName) },
     "Fecha":     { date:      { start: fechaDate } },
   };
 
@@ -153,14 +153,20 @@ function buildExpenseProperties(
   return props;
 }
 
-async function createExpensePage(properties: Record<string, unknown>): Promise<boolean> {
+async function createExpensePage(
+  properties: Record<string, unknown>,
+): Promise<{ ok: boolean; error?: string }> {
   const res = await fetch(`${NOTION_API}/pages`, {
     method: "POST",
     headers: notionHeaders(),
     body: JSON.stringify({ parent: { database_id: NOTION_EXPENSES_DB }, properties }),
   });
-  if (!res.ok) console.error("Notion expense POST error:", await res.text());
-  return res.ok;
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error("Notion expense POST error:", errText);
+    return { ok: false, error: errText.slice(0, 500) };
+  }
+  return { ok: true };
 }
 
 // ── Main handler ───────────────────────────────────────────────────────────────
@@ -238,15 +244,15 @@ Deno.serve(async (req) => {
   }
 
   // ── Sync expenses → BD Gastos ───────────────────────────────────────────────
-  const expenseResults: { id: string; ok: boolean }[] = [];
+  const expenseResults: { id: string; ok: boolean; error?: string }[] = [];
 
   for (const expense of expenses) {
     // Resolve relation for "Proyecto asociado"
     const projectPageId = await findProjectPageId(expense.project);
     const properties    = buildExpenseProperties(expense, userName, submittedAt, projectPageId);
-    const ok            = await createExpensePage(properties);
-    expenseResults.push({ id: expense.id, ok });
-    console.log(`Expense ${expense.id}: ${ok ? "synced" : "FAILED"}`);
+    const result        = await createExpensePage(properties);
+    expenseResults.push({ id: expense.id, ok: result.ok, error: result.error });
+    console.log(`Expense ${expense.id}: ${result.ok ? "synced" : "FAILED " + (result.error ?? "")}`);
   }
 
   // ── Summary ─────────────────────────────────────────────────────────────────
