@@ -132,12 +132,14 @@ function buildExpenseProperties(
   // Use the actual expense date if set, otherwise fall back to submission date
   const fechaDate = expense.expense_date ?? submittedAt.split("T")[0];
 
+  // BD Gastos actual schema: Concepto(title), Monto(number), Proveedor(select),
+  // Fecha(date), Categoría(select), "Proyecto asociado"(relation), Es recurrente(checkbox).
+  // NOTE: there is NO "Cliente" property in BD Gastos, so it is intentionally omitted.
   const props: Record<string, unknown> = {
-    "Concepto":  { title:     richText(expense.description ?? "") },
-    "Cliente":   { rich_text: richText(expense.client  ?? "") },
-    "Monto":     { number:    Number(expense.amount) ?? 0 },
-    "Proveedor": { rich_text: richText(userName) },
-    "Fecha":     { date:      { start: fechaDate } },
+    "Concepto":  { title:  richText(expense.description ?? "") },
+    "Monto":     { number: Number(expense.amount) ?? 0 },
+    "Proveedor": { select: { name: userName } },
+    "Fecha":     { date:   { start: fechaDate } },
   };
 
   // Categoría — only set when a value was chosen (select field)
