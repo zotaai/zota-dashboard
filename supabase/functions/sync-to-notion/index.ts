@@ -123,11 +123,38 @@ async function upsertActivityPage(
 
 // ── Expenses ───────────────────────────────────────────────────────────────────
 
+// Resolve (and cache) the name of the first checkbox property in BD Gastos,
+// so we set "recurring" correctly regardless of how the user named it.
+let checkboxPropCache: string | null | undefined = undefined;
+
+async function getCheckboxPropName(): Promise<string | null> {
+  if (checkboxPropCache !== undefined) return checkboxPropCache;
+  try {
+    const res = await fetch(`${NOTION_API}/databases/${NOTION_EXPENSES_DB}`, {
+      headers: notionHeaders(),
+    });
+    if (!res.ok) { checkboxPropCache = null; return null; }
+    const db = await res.json();
+    let found: string | null = null;
+    for (const [name, def] of Object.entries(db.properties ?? {})) {
+      if ((def as { type?: string }).type === "checkbox") { found = name; break; }
+    }
+    checkboxPropCache = found;
+    console.log("Checkbox property resolved to:", found);
+    return found;
+  } catch (e) {
+    console.error("getCheckboxPropName error:", e);
+    checkboxPropCache = null;
+    return null;
+  }
+}
+
 function buildExpenseProperties(
   expense:       { description: string; category: string; client: string; project: string; amount: number; expense_date?: string | null },
   userName:      string,
   submittedAt:   string,
   projectPageId: string | null,
+  checkboxProp:  string | null,
 ): Record<string, unknown> {
   // Use the actual expense date if set, otherwise fall back to submission date
   const fechaDate = expense.expense_date ?? submittedAt.split("T")[0];
@@ -249,10 +276,13 @@ Deno.serve(async (req) => {
   // ── Sync expenses → BD Gastos ───────────────────────────────────────────────
   const expenseResults: { id: string; ok: boolean; error?: string }[] = [];
 
+  // Resolve the recurring-checkbox property name once for this run
+  const checkboxProp = expenses.length > 0 ? await getCheckboxPropName() : null;
+
   for (const expense of expenses) {
     // Resolve relation for "Proyecto asociado"
     const projectPageId = await findProjectPageId(expense.project);
-    const properties    = buildExpenseProperties(expense, userName, submittedAt, projectPageId);
+    const properties    = buildExpenseProperties(expense, userName, submittedAt, projectPageId, checkboxProp);
     const result        = await createExpensePage(properties);
     expenseResults.push({ id: expense.id, ok: result.ok, error: result.error });
     console.log(`Expense ${expense.id}: ${result.ok ? "synced" : "FAILED " + (result.error ?? "")}`);
@@ -266,6 +296,7 @@ Deno.serve(async (req) => {
     reportId:         record.id,
     activitiesSynced: activityResults.length - failedAct.length,
     expensesSynced:   expenseResults.length  - failedExp.length,
+    recurrenteProp:   checkboxProp,
     failedActivities: failedAct,
     failedExpenses:   failedExp,
   };
