@@ -135,12 +135,15 @@ async function getCheckboxPropName(): Promise<string | null> {
     });
     if (!res.ok) { checkboxPropCache = null; return null; }
     const db = await res.json();
-    let found: string | null = null;
+    const checkboxes: string[] = [];
     for (const [name, def] of Object.entries(db.properties ?? {})) {
-      if ((def as { type?: string }).type === "checkbox") { found = name; break; }
+      if ((def as { type?: string }).type === "checkbox") checkboxes.push(name);
     }
+    // Only target a checkbox that is clearly about "recurrente" — never blindly
+    // tick an unrelated checkbox (e.g. "Devolución").
+    const found = checkboxes.find((n) => /recurr/i.test(n)) ?? null;
     checkboxPropCache = found;
-    console.log("Checkbox property resolved to:", found);
+    console.log("Checkbox candidates:", checkboxes, "→ recurrente:", found);
     return found;
   } catch (e) {
     console.error("getCheckboxPropName error:", e);
