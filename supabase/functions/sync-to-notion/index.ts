@@ -139,11 +139,13 @@ async function getCheckboxPropName(): Promise<string | null> {
     for (const [name, def] of Object.entries(db.properties ?? {})) {
       if ((def as { type?: string }).type === "checkbox") checkboxes.push(name);
     }
-    // Only target a checkbox that is clearly about "recurrente" — never blindly
-    // tick an unrelated checkbox (e.g. "Devolución").
-    const found = checkboxes.find((n) => /recurr/i.test(n)) ?? null;
+    // Per user choice: tick the "Devolución" checkbox on every expense.
+    // Fall back to the single checkbox if naming changes slightly.
+    const found =
+      checkboxes.find((n) => /devoluc/i.test(n)) ??
+      (checkboxes.length === 1 ? checkboxes[0] : null);
     checkboxPropCache = found;
-    console.log("Checkbox candidates:", checkboxes, "→ recurrente:", found);
+    console.log("Checkbox candidates:", checkboxes, "→ selected:", found);
     return found;
   } catch (e) {
     console.error("getCheckboxPropName error:", e);
