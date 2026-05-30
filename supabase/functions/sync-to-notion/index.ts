@@ -136,10 +136,11 @@ function buildExpenseProperties(
   // Fecha(date), Categoría(select), "Proyecto asociado"(relation), Es recurrente(checkbox).
   // NOTE: there is NO "Cliente" property in BD Gastos, so it is intentionally omitted.
   const props: Record<string, unknown> = {
-    "Concepto":  { title:  richText(expense.description ?? "") },
-    "Monto":     { number: Number(expense.amount) ?? 0 },
-    "Proveedor": { select: { name: userName } },
-    "Fecha":     { date:   { start: fechaDate } },
+    "Concepto":      { title:    richText(expense.description ?? "") },
+    "Monto":         { number:   Number(expense.amount) ?? 0 },
+    "Proveedor":     { select:   { name: userName } },
+    "Fecha":         { date:     { start: fechaDate } },
+    "Es recurrente": { checkbox: true },
   };
 
   // Categoría — only set when a value was chosen (select field)
