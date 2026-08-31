@@ -18,6 +18,18 @@ const NOTION_HEADERS = {
   "Content-Type": "application/json",
 };
 
+// ── CORS ─────────────────────────────────────────────────────────────────────
+// The dashboard is served from GitHub Pages (a different origin), so every
+// response must carry these headers or the browser blocks the fetch.
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Max-Age": "86400",
+};
+
+const JSON_HEADERS = { ...CORS_HEADERS, "Content-Type": "application/json" };
+
 // ── Notion fetch (handles pagination) ────────────────────────────────────────
 
 async function notionQuery(databaseId: string): Promise<Record<string, unknown>[]> {
@@ -80,8 +92,12 @@ function getText(props: Record<string, unknown>, key: string): string {
 // ── Main handler ──────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
+
   if (req.method !== "POST" && req.method !== "GET") {
-    return new Response("Method Not Allowed", { status: 405 });
+    return new Response("Method Not Allowed", { status: 405, headers: CORS_HEADERS });
   }
 
   try {
@@ -168,7 +184,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ ok: true, ...summary }), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: JSON_HEADERS,
     });
 
   } catch (err) {
@@ -176,7 +192,7 @@ Deno.serve(async (req) => {
     console.error("Sync error:", message);
     return new Response(JSON.stringify({ ok: false, error: message }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: JSON_HEADERS,
     });
   }
 });
