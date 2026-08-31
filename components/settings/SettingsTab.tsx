@@ -31,8 +31,12 @@ function NotionSyncSection() {
         // we re-read it. Realtime alone is not enough to rely on here.
         await refresh();
         setState("success");
+        const removed = (json.deleted_clients ?? 0) + (json.deleted_projects ?? 0);
         setDetail(
-          `${json.clients} clientes · ${json.projects} proyectos sincronizados`
+          `${json.clients} clientes · ${json.projects} proyectos sincronizados` +
+            (removed > 0
+              ? ` · ${json.deleted_clients} clientes y ${json.deleted_projects} proyectos eliminados`
+              : "")
         );
       } else {
         setState("error");
@@ -51,8 +55,9 @@ function NotionSyncSection() {
           Sincronización con Notion
         </h3>
         <p className="text-xs text-[#64748B]">
-          Importa clientes y proyectos desde la BD de Notion. También se
-          actualiza automáticamente cada hora.
+          Notion es la fuente única: se importan sus clientes y proyectos y se
+          eliminan los que ya no existan allá. También se actualiza
+          automáticamente cada hora.
         </p>
       </div>
 

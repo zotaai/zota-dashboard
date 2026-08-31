@@ -30,6 +30,13 @@ const CORS_HEADERS = {
 
 const JSON_HEADERS = { ...CORS_HEADERS, "Content-Type": "application/json" };
 
+// ── Deletion exceptions ──────────────────────────────────────────────────────
+// Sync mirrors Notion: anything Notion no longer has gets deleted here. These
+// clients are exempt because their projects live only in the dashboard — the
+// internal "Área - ..." ones used to log Zota own hours are not tracked in the
+// Notion projects database, and mirroring would wipe them.
+const DELETION_EXEMPT_CLIENTS = new Set<string>(["Zota IA Consulting"]);
+
 // ── Notion fetch (handles pagination) ────────────────────────────────────────
 
 async function notionQuery(databaseId: string): Promise<Record<string, unknown>[]> {
@@ -87,6 +94,12 @@ function getText(props: Record<string, unknown>, key: string): string {
   if (type === "title")     return ((prop.title as {plain_text:string}[]) ?? []).map(t => t.plain_text).join("").trim();
   if (type === "rich_text") return ((prop.rich_text as {plain_text:string}[]) ?? []).map(t => t.plain_text).join("").trim();
   return "";
+}
+
+// Composite identity for a project row. JSON keeps the two fields
+// unambiguous even when a name itself contains the separator.
+function projectKey(clientName: string, name: string): string {
+  return JSON.stringify([clientName, name]);
 }
 
 // ── Main handler ──────────────────────────────────────────────────────────────
@@ -173,11 +186,74 @@ Deno.serve(async (req) => {
       categoryCount = catRows.length;
     }
 
+    // 6. Mirror deletions: drop anything Notion no longer has.
+    //
+    // Guard: if Notion came back empty the call most likely failed upstream
+    // (bad token, API hiccup) rather than the databases genuinely being empty.
+    // Deleting on that signal would wipe the whole table, so bail out instead.
+    let deletedClients  = 0;
+    let deletedProjects = 0;
+
+    if (clientsToUpsert.size === 0) {
+      console.warn("Notion returned zero clients — skipping deletions to avoid wiping the tables.");
+    } else {
+      const notionClients = clientsToUpsert;
+      const notionProjects = new Set(
+        projectsToUpsert.map(p => projectKey(p.client_name, p.name))
+      );
+
+      // Snapshot both tables before deleting anything, so the cascade from
+      // clients -> projects is still visible in the counts we report back.
+      const [{ data: dbClients, error: lcErr }, { data: dbProjects, error: lpErr }] =
+        await Promise.all([
+          supabase.from("clients").select("name"),
+          supabase.from("projects").select("name, client_name"),
+        ]);
+      if (lcErr) throw lcErr;
+      if (lpErr) throw lpErr;
+
+      const staleClients = (dbClients ?? [])
+        .map(r => r.name as string)
+        .filter(name => !notionClients.has(name) && !DELETION_EXEMPT_CLIENTS.has(name));
+      const staleClientSet = new Set(staleClients);
+
+      const staleProjects = (dbProjects ?? []).filter(r => {
+        const client = r.client_name as string;
+        if (DELETION_EXEMPT_CLIENTS.has(client)) return false;
+        return (
+          staleClientSet.has(client) ||
+          !notionProjects.has(projectKey(client, r.name as string))
+        );
+      });
+      deletedProjects = staleProjects.length;
+
+      if (staleClients.length > 0) {
+        // projects.client_name cascades, so their projects go with them.
+        const { error: dcErr } = await supabase.from("clients").delete().in("name", staleClients);
+        if (dcErr) throw dcErr;
+        deletedClients = staleClients.length;
+      }
+
+      // Whatever the cascade did not take: a composite primary key, so
+      // PostgREST cannot express this as a single IN filter.
+      for (const proj of staleProjects) {
+        if (staleClientSet.has(proj.client_name as string)) continue;
+        const { error: dpErr } = await supabase
+          .from("projects")
+          .delete()
+          .eq("name", proj.name as string)
+          .eq("client_name", proj.client_name as string);
+        if (dpErr) throw dpErr;
+      }
+    }
+
     const summary = {
-      synced_at:  new Date().toISOString(),
-      clients:    clientRows.length,
-      projects:   projectsToUpsert.length,
-      categories: categoryCount,
+      synced_at:        new Date().toISOString(),
+      clients:          clientRows.length,
+      projects:         projectsToUpsert.length,
+      categories:       categoryCount,
+      deleted_clients:  deletedClients,
+      deleted_projects: deletedProjects,
     };
 
     console.log("Sync complete:", summary);
