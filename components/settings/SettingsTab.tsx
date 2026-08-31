@@ -8,6 +8,7 @@ import { ClientManager } from "./ClientManager";
 import { ProjectManager } from "./ProjectManager";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { useStore } from "@/lib/store";
 
 const SYNC_URL =
   "https://xlefqqlabeidndqsrvca.supabase.co/functions/v1/sync-from-notion";
@@ -15,6 +16,7 @@ const SYNC_URL =
 type SyncState = "idle" | "loading" | "success" | "error";
 
 function NotionSyncSection() {
+  const { refresh } = useStore();
   const [state, setState] = useState<SyncState>("idle");
   const [detail, setDetail] = useState<string>("");
 
@@ -25,6 +27,9 @@ function NotionSyncSection() {
       const res = await fetch(SYNC_URL, { method: "POST" });
       const json = await res.json();
       if (json.ok) {
+        // The sync writes straight to Postgres, so the local store is stale until
+        // we re-read it. Realtime alone is not enough to rely on here.
+        await refresh();
         setState("success");
         setDetail(
           `${json.clients} clientes · ${json.projects} proyectos sincronizados`

@@ -122,6 +122,7 @@ interface StoreContextValue {
   loading: boolean;
   syncing: boolean;
   connected: boolean;
+  refresh: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -222,7 +223,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <StoreContext.Provider value={{ state, dispatch, loading, syncing, connected }}>
+    <StoreContext.Provider value={{ state, dispatch, loading, syncing, connected, refresh: hydrate }}>
       {children}
     </StoreContext.Provider>
   );
