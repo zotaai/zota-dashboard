@@ -6,7 +6,8 @@
  * resubmitting a report rewrites its rows instead of duplicating them.
  *
  * SETUP
- *   1. Open the spreadsheet -> Extensiones -> Apps Script, paste this file.
+ *   1. Paste this file into Apps Script. The project does not have to be
+ *      bound to the spreadsheet: it opens it by id.
  *   2. Configuración del proyecto -> Propiedades del script -> add
  *      SHARED_SECRET with a long random value.
  *   3. Implementar -> Nueva implementación -> Aplicación web
@@ -21,6 +22,9 @@
  * request must carry SHARED_SECRET.
  */
 
+// Opened by id rather than SpreadsheetApp.getActive(), so the script works
+// whether or not the project is bound to the spreadsheet.
+var SPREADSHEET_ID = '1C0Ej9xtjyZevHVRrgPYYESy3i0W02nRxlfCMHtNumdw';
 var SHEET_NAME     = 'Registros de Dedicaciones';
 var HEADER_ROWS    = 1;
 var ID_COLUMN      = 7;  // G — ID Actividad
@@ -47,7 +51,7 @@ function doPost(e) {
     // same row.
     lock.waitLock(30000);
 
-    var sheet = SpreadsheetApp.getActive().getSheetByName(SHEET_NAME);
+    var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
     if (!sheet) return respond({ ok: false, error: 'sheet not found: ' + SHEET_NAME });
 
     var rowById = readIdIndex(sheet);
