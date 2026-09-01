@@ -1,13 +1,13 @@
 // Supabase Edge Function: sync-to-notion
 // Triggered via Database Webhook on the `reports` table (UPDATE).
 // When a report's status changes to "submitted":
-//   • Activities → Notion "Registros de Dedicaciones" (NOTION_DATABASE_ID)
+//   • Activities → Google Sheets "Registro de Dedicaciones" (GOOGLE_SHEETS_ID)
 //   • Expenses   → Notion "BD Gastos"                 (NOTION_EXPENSES_DB_ID)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { syncActivitiesToSheet } from "./sheets.ts";
 
 const NOTION_TOKEN       = Deno.env.get("NOTION_TOKEN")!;
-const NOTION_DB_ID       = Deno.env.get("NOTION_DATABASE_ID")!;    // Registros de Dedicaciones
 const NOTION_EXPENSES_DB = Deno.env.get("NOTION_EXPENSES_DB_ID")!; // BD Gastos
 const NOTION_PROJECTS_DB = "1157571d-e218-8367-b1a2-01b847034157"; // BD Proyectos (for relation lookup)
 const SUPABASE_URL       = Deno.env.get("SUPABASE_URL")!;
@@ -62,63 +62,6 @@ async function findProjectPageId(projectName: string): Promise<string | null> {
   projectPageCache.set(projectName, pageId);
   console.log(`Project "${projectName}" → page ID: ${pageId ?? "not found"}`);
   return pageId;
-}
-
-// ── Activities ─────────────────────────────────────────────────────────────────
-
-function buildActivityProperties(
-  activity:   { id: string; description: string; client: string; project: string; days: number },
-  userName:   string,
-  periodName: string,
-  reportId:   string,
-) {
-  return {
-    "Descripción":  { title:     richText(activity.description ?? "") },
-    "ID Actividad": { rich_text: richText(activity.id) },
-    "Cliente":      { rich_text: richText(activity.client  ?? "") },
-    "Proyecto":     { rich_text: richText(activity.project ?? "") },
-    "Días":         { number:    Number(activity.days) ?? 0 },
-    "Usuario":      { rich_text: richText(userName) },
-    "Reporte ID":   { rich_text: richText(reportId) },
-    "Periodo":      { rich_text: richText(periodName) },
-  };
-}
-
-async function findPageByActivityId(activityId: string): Promise<string | null> {
-  const res = await fetch(`${NOTION_API}/databases/${NOTION_DB_ID}/query`, {
-    method: "POST",
-    headers: notionHeaders(),
-    body: JSON.stringify({
-      filter: { property: "ID Actividad", rich_text: { equals: activityId } },
-      page_size: 1,
-    }),
-  });
-  if (!res.ok) { console.error("Notion activity query error:", await res.text()); return null; }
-  const data = await res.json();
-  return data.results?.[0]?.id ?? null;
-}
-
-async function upsertActivityPage(
-  properties: Record<string, unknown>,
-  existingPageId: string | null,
-): Promise<boolean> {
-  if (existingPageId) {
-    const res = await fetch(`${NOTION_API}/pages/${existingPageId}`, {
-      method: "PATCH",
-      headers: notionHeaders(),
-      body: JSON.stringify({ properties }),
-    });
-    if (!res.ok) console.error("Notion activity PATCH error:", await res.text());
-    return res.ok;
-  } else {
-    const res = await fetch(`${NOTION_API}/pages`, {
-      method: "POST",
-      headers: notionHeaders(),
-      body: JSON.stringify({ parent: { database_id: NOTION_DB_ID }, properties }),
-    });
-    if (!res.ok) console.error("Notion activity POST error:", await res.text());
-    return res.ok;
-  }
 }
 
 // ── Expenses ───────────────────────────────────────────────────────────────────
@@ -267,15 +210,25 @@ Deno.serve(async (req) => {
   const activities  = activitiesData ?? [];
   const expenses    = expensesData   ?? [];
 
-  // ── Sync activities → Registros de Dedicaciones ─────────────────────────────
+  // ── Sync activities → Google Sheets ─────────────────────────────────────────
+  // Dedications moved out of Notion to the "Registro de Dedicaciones" sheet.
+  // Expenses below still go to Notion's BD Gastos.
   const activityResults: { id: string; ok: boolean }[] = [];
+  let sheetError: string | null = null;
 
-  for (const activity of activities) {
-    const properties     = buildActivityProperties(activity, userName, periodName, record.id);
-    const existingPageId = await findPageByActivityId(activity.id);
-    const ok             = await upsertActivityPage(properties, existingPageId);
-    activityResults.push({ id: activity.id, ok });
-    console.log(`Activity ${activity.id}: ${ok ? "synced" : "FAILED"}`);
+  try {
+    const { updated, appended } = await syncActivitiesToSheet(
+      activities,
+      userName,
+      periodName,
+      record.id,
+    );
+    activities.forEach(a => activityResults.push({ id: a.id, ok: true }));
+    console.log(`Activities → sheet: ${updated} updated, ${appended} appended`);
+  } catch (err) {
+    sheetError = err instanceof Error ? err.message : String(err);
+    activities.forEach(a => activityResults.push({ id: a.id, ok: false }));
+    console.error("Sheet sync failed:", sheetError);
   }
 
   // ── Sync expenses → BD Gastos ───────────────────────────────────────────────
@@ -300,6 +253,7 @@ Deno.serve(async (req) => {
   const summary = {
     reportId:         record.id,
     activitiesSynced: activityResults.length - failedAct.length,
+    sheetError,
     expensesSynced:   expenseResults.length  - failedExp.length,
     recurrenteProp:   checkboxProp,
     failedActivities: failedAct,
