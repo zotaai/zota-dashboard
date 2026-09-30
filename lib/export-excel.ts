@@ -44,7 +44,7 @@ export async function exportReportToExcel(
     { header: "", key: "days",    width: 12 },
   ];
 
-  const titleAct = wsAct.addRow([`Reporte Quincenal — ${period.name}`, "", ""]);
+  const titleAct = wsAct.addRow([`Reporte — ${period.name}`, "", ""]);
   styleTitleRow(titleAct);
   wsAct.addRow([`Consultor: ${user.name}`, "", ""]);
   wsAct.addRow([
@@ -121,7 +121,7 @@ export async function exportReportToExcel(
   ];
 
   const titleSum = wsSummary.addRow([
-    "ZOTA AI CONSULTING — REPORTE QUINCENAL",
+    "ZOTA AI CONSULTING — REPORTE DE DEDICACIONES",
     "",
   ]);
   styleTitleRow(titleSum);

@@ -397,7 +397,7 @@ export function ReportTab() {
             className="w-full bg-[#0296DF] py-5 text-sm font-semibold tracking-wide text-white transition-all hover:bg-[#0284c7] hover:shadow-lg hover:shadow-[#0296DF]/20 disabled:cursor-not-allowed disabled:opacity-30"
           >
             <Send className="mr-2 h-4 w-4" />
-            {submitting ? "ENVIANDO…" : "ENVIAR REPORTE QUINCENAL"}
+            {submitting ? "ENVIANDO…" : "ENVIAR REPORTE"}
           </Button>
         </div>
       )}
@@ -462,7 +462,7 @@ export function ReportTab() {
               Reporte enviado
             </DialogTitle>
             <DialogDescription className="text-center text-sm text-[#475569]">
-              Se registró el reporte quincenal correctamente. Ya no podrás
+              Se registró el reporte correctamente. Ya no podrás
               realizar cambios en este período.
             </DialogDescription>
           </DialogHeader>

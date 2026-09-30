@@ -33,7 +33,7 @@ function lastDay(year: number, month: number) {
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
-interface QuincenaPreview {
+interface PeriodPreview {
   id:          string;
   name:        string;
   startDate:   string;
@@ -48,11 +48,11 @@ export function PeriodManager() {
 
   const [year,    setYear]    = useState<string>(THIS_YEAR.toString());
   const [month,   setMonth]   = useState<string>("");
-  const [preview, setPreview] = useState<QuincenaPreview[]>([]);
+  const [preview, setPreview] = useState<PeriodPreview[]>([]);
   const [saving,  setSaving]  = useState(false);
 
   // ── Generate preview ───────────────────────────────────────────────────────
-  function buildPreview(y: string, m: string): QuincenaPreview[] {
+  function buildPreview(y: string, m: string): PeriodPreview[] {
     if (!y || !m) return [];
     const yn = parseInt(y);
     const mn = parseInt(m); // 1-based
@@ -60,20 +60,15 @@ export function PeriodManager() {
     const last = lastDay(yn, mn);
     const mm   = pad(mn);
 
+    // Periods run by calendar month from September 2026 on. Earlier months were
+    // split into two quincenas and keep their original ids and names.
     return [
       {
-        id:          `${yn}${mm}1`,
-        name:        `1ra Quincena ${MONTHS[mn - 1]} ${yn}`,
+        id:          `${yn}${mm}`,
+        name:        `${MONTHS[mn - 1]} ${yn}`,
         startDate:   `${yn}-${mm}-01`,
-        endDate:     `${yn}-${mm}-15`,
-        workingDays: calculateWorkingDays(`${yn}-${mm}-01`, `${yn}-${mm}-15`),
-      },
-      {
-        id:          `${yn}${mm}2`,
-        name:        `2da Quincena ${MONTHS[mn - 1]} ${yn}`,
-        startDate:   `${yn}-${mm}-16`,
         endDate:     `${yn}-${mm}-${last}`,
-        workingDays: calculateWorkingDays(`${yn}-${mm}-16`, `${yn}-${mm}-${last}`),
+        workingDays: calculateWorkingDays(`${yn}-${mm}-01`, `${yn}-${mm}-${last}`),
       },
     ];
   }
@@ -151,7 +146,7 @@ export function PeriodManager() {
           GESTIÓN DE PERÍODOS
         </h2>
         <p className="text-xs text-[#64748B]">
-          Selecciona el año y el mes — las dos quincenas se generan automáticamente.
+          Selecciona el año y el mes — el período se genera automáticamente.
           Ajusta los días laborables si hay feriados y luego guarda.
         </p>
       </div>
@@ -248,7 +243,7 @@ export function PeriodManager() {
               className="h-9 bg-[#0296DF] text-sm font-medium text-white hover:bg-[#0284c7] disabled:opacity-40"
             >
               <Save className="mr-1.5 h-4 w-4" />
-              {saving ? "Guardando…" : allExist ? "Ya guardados" : "Guardar Quincenas"}
+              {saving ? "Guardando…" : allExist ? "Ya guardado" : "Guardar Período"}
             </Button>
           </>
         )}

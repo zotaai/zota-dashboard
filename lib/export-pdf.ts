@@ -52,7 +52,7 @@ export async function exportReportToPDF(
   doc.setFontSize(9);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...BRAND.white);
-  doc.text("REPORTE QUINCENAL", pageW - margin, 18, { align: "right" });
+  doc.text("REPORTE DE DEDICACIONES", pageW - margin, 18, { align: "right" });
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(...BRAND.blue);

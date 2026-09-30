@@ -80,7 +80,7 @@ export function AnalyticsTab() {
 
         <ChartCard
           title="Días por Período"
-          subtitle="Total de días laborables registrados por quincena"
+          subtitle="Total de días laborables registrados por período"
         >
           <TimelineBarChart data={analytics.periodTrend} />
         </ChartCard>

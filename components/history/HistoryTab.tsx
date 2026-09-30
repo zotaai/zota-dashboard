@@ -14,7 +14,7 @@ import type { BillingPeriod } from "@/types";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-type FilterType = "quincena" | "mes" | "trimestre" | "semestre" | "año";
+type FilterType = "periodo" | "mes" | "trimestre" | "semestre" | "año";
 
 const MONTHS = [
   "Enero","Febrero","Marzo","Abril","Mayo","Junio",
@@ -33,7 +33,7 @@ function localDate(period: BillingPeriod): Date {
 export function HistoryTab() {
   const { state } = useStore();
 
-  const [filterType,  setFilterType]  = useState<FilterType>("quincena");
+  const [filterType,  setFilterType]  = useState<FilterType>("periodo");
   const [filterValue, setFilterValue] = useState<string>("all");
   const [filterUser,  setFilterUser]  = useState<string>("all");
 
@@ -65,7 +65,7 @@ export function HistoryTab() {
     };
 
     switch (filterType) {
-      case "quincena":
+      case "periodo":
         return unique(periods.map(p => ({ value: p.id, label: p.name })));
 
       case "mes":
@@ -129,7 +129,7 @@ export function HistoryTab() {
       const d = localDate(p);
 
       switch (filterType) {
-        case "quincena":  return r.periodId === filterValue;
+        case "periodo":   return r.periodId === filterValue;
         case "mes":       return `${d.getFullYear()}-${d.getMonth()}` === filterValue;
         case "trimestre": return `${d.getFullYear()}-Q${Math.floor(d.getMonth() / 3)}` === filterValue;
         case "semestre":  return `${d.getFullYear()}-S${d.getMonth() < 6 ? 0 : 1}` === filterValue;
@@ -177,7 +177,7 @@ export function HistoryTab() {
           REPORTES ENVIADOS
         </h2>
         <p className="mb-4 text-xs text-[#64748B]">
-          Consulta los registros de dedicaciones y gastos de todos los reportes quincenales publicados.
+          Consulta los registros de dedicaciones y gastos de todos los reportes publicados.
         </p>
 
         <div className="flex flex-wrap gap-3">
@@ -200,7 +200,7 @@ export function HistoryTab() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="quincena">Quincena</SelectItem>
+              <SelectItem value="periodo">Período</SelectItem>
               <SelectItem value="mes">Mes</SelectItem>
               <SelectItem value="trimestre">Trimestre</SelectItem>
               <SelectItem value="semestre">Semestre</SelectItem>
