@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { ClipboardList, Receipt, FileX } from "lucide-react";
+import { ClipboardList, Receipt, FileX, ExternalLink } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { DEDICATIONS_SHEET_URL } from "@/lib/sheets";
 import type { BillingPeriod } from "@/types";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -173,9 +175,31 @@ export function HistoryTab() {
 
       {/* Header + filters */}
       <div>
-        <h2 className="mb-0.5 text-base font-semibold tracking-wide text-[#1E293B]">
-          REPORTES ENVIADOS
-        </h2>
+        <div className="mb-0.5 flex items-start justify-between gap-3">
+          <h2 className="text-base font-semibold tracking-wide text-[#1E293B]">
+            REPORTES ENVIADOS
+          </h2>
+
+          {/* The sheet is the mirror of these same dedications, so it opens in
+              its own tab rather than replacing the dashboard. */}
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            className="h-8 shrink-0 border-[#0296DF]/30 bg-white text-xs font-medium text-[#0296DF] hover:bg-[#0296DF]/10 hover:text-[#0284c7]"
+          >
+            <a
+              href={DEDICATIONS_SHEET_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Abre la hoja de cálculo en una pestaña nueva"
+            >
+              <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+              Ver en Google Sheets
+            </a>
+          </Button>
+        </div>
+
         <p className="mb-4 text-xs text-[#64748B]">
           Consulta los registros de dedicaciones y gastos de todos los reportes publicados.
         </p>
