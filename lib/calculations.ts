@@ -1,3 +1,5 @@
+import { peruHolidays } from "./holidays";
+
 export function calculateWorkingDays(startDate: string, endDate: string): number {
   if (!startDate || !endDate) return 0;
 
@@ -13,11 +15,21 @@ export function calculateWorkingDays(startDate: string, endDate: string): number
   const end   = parseLocal(endDate);
   if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) return 0;
 
+  // Peruvian national holidays are not working days. Collect them per year so
+  // a range spanning a year boundary still resolves correctly.
+  const holidays = new Set<string>();
+  for (let y = start.getFullYear(); y <= end.getFullYear(); y++) {
+    for (const h of peruHolidays(y)) holidays.add(h.date);
+  }
+
+  const iso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
   let workingDays = 0;
   const current = new Date(start);
   while (current <= end) {
     const day = current.getDay();
-    if (day !== 0 && day !== 6) workingDays++;
+    if (day !== 0 && day !== 6 && !holidays.has(iso(current))) workingDays++;
     current.setDate(current.getDate() + 1);
   }
   return workingDays;

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
 import { calculateWorkingDays } from "@/lib/calculations";
+import { holidaysBetween } from "@/lib/holidays";
 import type { BillingPeriod } from "@/types";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -236,6 +237,35 @@ export function PeriodManager() {
                 })}
               </div>
             </div>
+
+            {(() => {
+              const feriados = preview.flatMap(q => holidaysBetween(q.startDate, q.endDate));
+              if (feriados.length === 0) {
+                return (
+                  <p className="mb-3 text-xs text-[#64748B]">
+                    Sin feriados nacionales en este período.
+                  </p>
+                );
+              }
+              return (
+                <div className="mb-3 rounded-lg border border-[#F59E0B]/25 bg-[#F59E0B]/[0.07] px-3 py-2">
+                  <p className="mb-1 text-xs font-medium text-[#B45309]">
+                    {feriados.length === 1
+                      ? "1 feriado nacional descontado"
+                      : `${feriados.length} feriados nacionales descontados`}
+                  </p>
+                  <ul className="space-y-0.5">
+                    {feriados.map(f => (
+                      <li key={f.date + f.name} className="text-xs text-[#92400E]">
+                        {new Date(f.date + "T00:00:00").toLocaleDateString("es-PE", {
+                          day: "2-digit", month: "long", weekday: "long",
+                        })}{" — "}{f.name}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
 
             <Button
               onClick={handleSave}
