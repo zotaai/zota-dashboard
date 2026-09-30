@@ -13,11 +13,13 @@ import {
 } from "@/components/ui/dialog";
 import { useStore } from "@/lib/store";
 import { calculateWorkingDays } from "@/lib/calculations";
+import { newNonWorkingEntry, isCompleteNonWorking } from "@/lib/non-working";
 import { exportReportToPDF } from "@/lib/export-pdf";
 import { exportReportToExcel } from "@/lib/export-excel";
 import { ReportFilters } from "./ReportFilters";
 import { ActivityTable } from "./ActivityTable";
 import { ExpenseTable } from "./ExpenseTable";
+import { NonWorkingTable } from "./NonWorkingTable";
 import { DayCounter } from "./DayCounter";
 import type { Activity, Expense, Report } from "@/types";
 
@@ -130,9 +132,31 @@ export function ReportTab() {
       : calculateWorkingDays(p.startDate, p.endDate);
   }, [state.periods, selectedPeriod]);
 
+  const selectedUserName = useMemo(
+    () => state.users.find((u) => u.id === selectedUser)?.name ?? "",
+    [state.users, selectedUser]
+  );
+
+  // One array backs both tables; each section renders its own kind.
+  const dedications = useMemo(
+    () => activities.filter((a) => a.kind !== "non_working"),
+    [activities]
+  );
+  const nonWorking = useMemo(
+    () => activities.filter((a) => a.kind === "non_working"),
+    [activities]
+  );
+
+  // Leave counts toward the period like worked time, so it is part of the sum.
   const totalRecordedDays = useMemo(
     () => activities.reduce((s, a) => s + a.days, 0),
     [activities]
+  );
+
+  // Half-filled leave rows would silently reach the sheet as blank entries.
+  const incompleteNonWorking = useMemo(
+    () => nonWorking.filter((a) => !isCompleteNonWorking(a)).length,
+    [nonWorking]
   );
 
   const totalExpenses = useMemo(
@@ -147,7 +171,7 @@ export function ReportTab() {
   const step3         = step2 && hasRecords;
   const hoursComplete = totalRecordedDays >= targetDays && targetDays > 0;
   const canSaveDraft  = step3 && !hoursComplete && !isSubmitted;
-  const canSubmit     = step3 && hoursComplete  && !isSubmitted;
+  const canSubmit     = step3 && hoursComplete  && !isSubmitted && incompleteNonWorking === 0;
 
   // Current active step for the indicator
   const currentStep = isSubmitted ? 5
@@ -159,6 +183,8 @@ export function ReportTab() {
 
   // ── Hint message ───────────────────────────────────────────────────────────
   const hint = isSubmitted ? null
+    : incompleteNonWorking > 0
+      ? `Completa el tipo y los días de ${incompleteNonWorking} registro(s) de días no laborados.`
     : !step1        ? "Selecciona tu usuario para comenzar."
     : !step2        ? "Ahora selecciona el período quincen al."
     : !step3        ? "Añade al menos una dedicación o gasto para continuar."
@@ -166,11 +192,14 @@ export function ReportTab() {
       ? `Registra ${(targetDays - totalRecordedDays).toFixed(1)} día(s) más para poder enviar. Puedes guardar tu avance.`
     : "¡Días completos! Ya puedes enviar tu reporte.";
 
+  const addNonWorking = () =>
+    setActivities((prev) => [...prev, newNonWorkingEntry()]);
+
   // ── Activity handlers ──────────────────────────────────────────────────────
   const addActivity = () =>
     setActivities((prev) => [
       ...prev,
-      { id: Date.now().toString(), description: "", client: "", project: "", days: 0 },
+      { id: Date.now().toString(), description: "", client: "", project: "", days: 0, kind: "dedication" },
     ]);
 
   const updateActivity = (id: string, field: keyof Activity, value: string | number) =>
@@ -334,10 +363,17 @@ export function ReportTab() {
       {/* ── Tables — locked until period is selected ── */}
       <div className={`mt-5 transition-opacity ${step2 ? "opacity-100" : "pointer-events-none opacity-30"}`}>
         <ActivityTable
-          activities={activities}
+          activities={dedications}
           clients={state.clients}
           projects={state.projects}
           onAdd={addActivity}
+          onUpdate={updateActivity}
+          onDelete={deleteActivity}
+        />
+        <NonWorkingTable
+          entries={nonWorking}
+          userName={selectedUserName}
+          onAdd={addNonWorking}
           onUpdate={updateActivity}
           onDelete={deleteActivity}
         />

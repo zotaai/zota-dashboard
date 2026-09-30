@@ -171,3 +171,13 @@ create trigger trg_notify_notion_on_submit
   after update on public.reports
   for each row
   execute function public.notify_notion_on_submit();
+
+-- ── Migration: non-working days (leave / vacation) ───────────────────────────
+-- Leave lives in `activities` so it counts toward the period's day target and
+-- reaches the sheet and the exports through the paths that already exist.
+-- 'dedication' is work for a client; 'non_working' is leave or vacation, which
+-- the form files with a fixed client and project.
+-- Safe to run multiple times.
+
+alter table public.activities
+  add column if not exists kind text not null default 'dedication';

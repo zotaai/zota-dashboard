@@ -20,6 +20,8 @@ function mapActivity(r: Record<string, unknown>): Activity {
     client:      (r.client as string) ?? "",
     project:     (r.project as string) ?? "",
     days:        Number(r.days),
+    // Rows written before non-working days existed have no kind.
+    kind:        (r.kind as Activity["kind"]) ?? "dedication",
   };
 }
 
@@ -62,7 +64,7 @@ export async function fetchAllData(): Promise<AppState> {
     supabase.from("projects").select("name, client_name").order("client_name").order("name"),
     supabase
       .from("reports")
-      .select("*, activities(id,description,client,project,days), expenses(id,description,category,client,project,amount,expense_date,file_name,file_data)")
+      .select("*, activities(id,description,client,project,days,kind), expenses(id,description,category,client,project,amount,expense_date,file_name,file_data)")
       .order("submitted_at", { ascending: false }),
     supabase.from("expense_categories").select("name").order("name"),
   ]);
@@ -184,7 +186,7 @@ export async function saveDraft(report: Report) {
     const { error: aErr } = await supabase.from("activities").insert(
       report.activities.map(a => ({
         id: a.id, report_id: report.id, description: a.description,
-        client: a.client, project: a.project, days: a.days,
+        client: a.client, project: a.project, days: a.days, kind: a.kind,
       }))
     );
     if (aErr) throw aErr;

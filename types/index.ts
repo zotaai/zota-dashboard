@@ -16,12 +16,21 @@ export interface Project {
   clientName: string;
 }
 
+/**
+ * A dedication is work done for a client; a non-working entry is leave or
+ * holiday. Both consume days of the period, so they share this table and both
+ * count toward the period's target — they differ in how they are entered and
+ * shown, not in what they mean for the day count.
+ */
+export type ActivityKind = "dedication" | "non_working";
+
 export interface Activity {
   id: string;
   description: string;
   client: string;
   project: string;
   days: number;
+  kind: ActivityKind;
 }
 
 export interface Expense {
